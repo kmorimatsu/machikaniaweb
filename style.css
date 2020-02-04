@@ -1,0 +1,39 @@
+/**********************************
+* KM-BASIC web written by Katsumi *
+*     This script is released     *
+*       under the LGPL v2.1.      *
+**********************************/
+
+body {
+	background: #404040;
+	width: 910px;
+}
+.main {
+	width: 400px;
+	float: left;
+}
+.side {
+	width: 500px;
+	font-family: monospace;
+	color: #fff;
+	float: right;
+	display: none;
+}
+.buttons{
+	background: #fff;
+	width: 384px;
+}
+.basicsource{
+	font-family: monospace;
+	width: 400px;
+	height: 100px;
+}
+.help{
+	font-family: monospace;
+	width: 500px;
+	height: 600px;
+	background: #fff;
+}
+#code {
+	display:none;
+}

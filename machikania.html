@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<!--
+/************************************
+* MachiKania web written by Katsumi *
+*      This script is released      *
+*        under the LGPL v2.1.       *
+************************************/
+-->
+<head>
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" type="text/css" href="./style.css" />
+	<!-- Load javascript fies -->
+	<script type="text/javascript" src="./get.js"></script>
+	<script type="text/javascript" src="./dom.js"></script>
+	<script type="text/javascript" src="./display.js"></script>
+	<script type="text/javascript" src="./keyboard.js"></script>
+	<script type="text/javascript" src="./system.js"></script>
+	<script type="text/javascript" src="./filesystem.js"></script>
+	<script type="text/javascript" src="./sfr.js"></script>
+	<script type="text/javascript" src="./timer.js"></script>
+	<script type="text/javascript" src="./interrupt.js"></script>
+	<script type="text/javascript" src="./mips32.js"></script>
+	<script type="text/javascript" src="./mips32cp0.js"></script>
+	<script type="text/javascript" src="./hexfile.js"></script>
+	<title>MachiKania web v0.1</title>
+</head>
+<body>
+	<div class="side" id="side">
+		<iframe src="help.txt" class="help"></iframe>
+	</div>
+	<div class="main">
+		<!-- Main canvas used for display with 30x27 character resolution -->
+		<canvas id="display" width="384" height="216"></canvas>
+		<!-- Canvas used for constructing character image -->
+		<canvas id="font" width="8" height="8" style="display:none;"></canvas>
+		<!-- Debug buttons -->
+		<div class="buttons">
+			<span id="speed">clock: 0 hz</span><br />
+		</div>
+		<div id="debug" class="buttons" style="display:none;">
+			<!-- debug -->
+			<input id="stepnum" value="100000" type="text" />
+			<input id="step" value="STEP" type="button" onclick="steprun(dom.getElement('stepnum').value);"/><br />
+			<input id="goto" value="RUN TO" type="button" onclick="breakat(dom.getElement('breakat').value);"/>
+			<input id="breakat" value="0x9D007000" type="text" /><br />
+			<input id="setpc" value="Set PC" type="button" onclick="setpc(dom.getElement('setpcvalue').value);"/>
+			<input id="setpcvalue" value="0xA0007000" type="text" /><br />
+			<input id="dump" value="DUMP" type="button" onclick="dump(dom.getElement('dumpaddr').value);"/>
+			<input id="dumpaddr" value="0xA0007000" type="text" /><br />
+			<input id="step" value="Regsters" type="button" onclick=";mips32.logreg();"/>
+		</div>
+	</div>
+	<!-- Load main script -->
+	<script type="text/javascript" src="./main.js"></script>
+	<!-- -->
+</body>
+</html>
