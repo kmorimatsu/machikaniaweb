@@ -35,11 +35,11 @@ main=function(maxspeed,breakpoint){
 				if (speed<1) speed=1;
 			}
 			// Show the current speed
-			if (msec<32) {
+			/*if (msec<32) {
 				dom.getElement('speed').innerHTML='clock: '+parseInt(speed*1000/16)+' hz';
 			} else {
 				dom.getElement('speed').innerHTML='clock: '+parseInt(speed*(1000/msec))+' hz';
-			}
+			}//*/
 			// Execute MIPS32 1/64 times
 			// This corresponds to something like using NTSC video in MachiKania
 			// CPU will work with 1.5 MIPS. This is about 20 times slower than Real MachiKania type M

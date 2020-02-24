@@ -1164,7 +1164,7 @@ mips32.SRAV=function(){
 	var rs=this.GPR(this.rs);
 	var rd=rt;
 	var sign=rt&0x80000000;
-	while(ss--){
+	while(rs--){
 		rd=(rd>>1)|sign;
 	}
 	this.GPR.set(this.rd,rd);

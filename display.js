@@ -46,13 +46,6 @@ display.all=function(){
 			addr=posy*this.width+posx;
 			if ((addr&3)==0) {
 				data=system.read32(system.pTVRAM+addr);
-				/*if (data===this.prevview[posy*this.width+posx]) {
-					// View data is the same as before. Skip redraw.
-					posx+=3;
-					continue;
-				} else {
-					this.prevview[posy*this.width+posx]=data;
-				}//*/
 			}
 			this.context.putImageData(this.font[(data>>((addr&3)*8))&255],posx<<3,posy<<3);
 		}

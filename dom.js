@@ -5,12 +5,12 @@
 ************************************/
 
 window.onkeydown=function(e){
- 	keyboard.keydown(e.keyCode);
+ 	keyboard.keydown(e.keyCode,e);
 	if (get.debug) return true;
 	else return false;
 };
 window.onkeyup=function(e){
- 	keyboard.keyup(e.keyCode);
+ 	keyboard.keyup(e.keyCode,e);
 	if (get.debug) return true;
 	else return false;
 };

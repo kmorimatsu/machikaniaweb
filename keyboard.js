@@ -8,6 +8,8 @@
 
 keyboard=new Object();
 keyboard.shiftkey=0;
+keyboard.capslock=0;
+keyboard.kanamode=0;
 keyboard.keyArray=new Array();
 keyboard.ps2readkey=function(){
 	var vkey;
@@ -33,18 +35,36 @@ keyboard.keydown=function(code){
 			return;
 	}
 };
-keyboard.keyup=function(code){
+keyboard.keyup=function(code,event){
 	switch(code){
 		case 0x10: // Shift
 			this.shiftkey=0;
+			return;
+		case 0x14: // CapsLock
+			this.capslock=event.getModifierState("CapsLock") ? 1:0;
+			return;
+		case 0x15: // KanaMode
+			this.kanamode=event.getModifierState("KanaMode") ? 1:0;
 			return;
 		default:
 			return;
 	}
 };
 keyboard.convertCode=function(code){
-	if (this.shiftkey) return this.vk2asc2_en[code];
-	else return this.vk2asc1_en[code];
+	var shiftkey=this.shiftkey;
+	if (0x41<=code && code<=0x5a && this.capslock && !this.kanamode) shiftkey=shiftkey ? 0:1;
+	if (get.jp) {
+		if (this.kanamode) {
+			if (shiftkey) return this.vk2kana2[code];
+			else return this.vk2kana1[code];
+		} else {
+			if (shiftkey) return this.vk2asc2_jp[code];
+			else return this.vk2asc1_jp[code];
+		}
+	} else {
+		if (shiftkey) return this.vk2asc2_en[code];
+		else return this.vk2asc1_en[code];
+	}
 };
 keyboard.init=function(){
 	var i;

@@ -284,11 +284,11 @@ system.read16=function(address){
 		this.exception("Address Error (read16)");
 	}
 	var data=this.read32(address&0xFFFFFFFC);
-	switch(address&1){
+	switch(address&2){
 		// Little endian
 		case 0:
 			return data&0xffff
-		case 1:
+		case 2:
 		default:
 			return (data>>16)&0xffff
 	}
@@ -298,12 +298,12 @@ system.write16=function(address,data){
 		this.exception("Address Error (write16)");
 	}
 	var read=this.read32(address&0xFFFFFFFC);
-	switch(address&1){
+	switch(address&2){
 		// Little endian
 		case 0:
 			data=(data&0xffff) | (read&0xFFFF0000);
 			break;
-		case 1:
+		case 2:
 		default:
 			data=((data&0xffff)<<16) | (read&0x0000FFFF);
 			break;
