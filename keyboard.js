@@ -4,11 +4,14 @@
 *          under the LGPL v2.1.         *
 ****************************************/
 
-// TODO: capslock, shiftkeys in PIC32 etc.
-
 keyboard=new Object();
-keyboard.shiftkey=0;
 keyboard.capslock=0;
+keyboard.numlock=0;
+keyboard.scrolllock=0;
+keyboard.winkey=0;
+keyboard.altkey=0;
+keyboard.ctrlkey=0;
+keyboard.shiftkey=0;
 keyboard.kanamode=0;
 keyboard.keyArray=new Array();
 keyboard.ps2readkey=function(){
@@ -18,36 +21,50 @@ keyboard.ps2readkey=function(){
 	} else {
 		vkey=this.keyArray.pop();
 	}
+	var ascii=this.convertCode(vkey);
 	if (system.pVkey) {
+		if (vkey) vkey|=this.shiftkeys()<<8;
 		system.write16(system.pVkey,vkey);
 	}
-	var ascii=this.convertCode(vkey);
-	//if (vkey) dom.log('vkey 0x'+vkey.toString(16)+' ascii 0x'+ascii.toString(16));
 	return ascii;
 };
-keyboard.keydown=function(code){
-	switch(code){
-		case 0x10: // Shift
-			this.shiftkey=1;
-			return;
-		default:
-			this.keyArray.push(code);
-			return;
+keyboard.shiftkeys=function(){
+	var vkey=0;
+	// <0><CAPSLK><NUMLK><SCRLK><Win><ALT><CTRL><SHIFT>
+	if (this.capslock) vkey|=0x40;
+	if (this.numlock) vkey|=0x20;
+	if (this.scrolllock) vkey|=0x10;
+	if (this.winkey) vkey|=0x08;
+	if (this.altkey) vkey|=0x04;
+	if (this.ctrlkey) vkey|=0x02;
+	if (this.shiftkey) vkey|=0x01;
+	return vkey;
+};
+keyboard.kanaclick=function(lock){
+	this.kanamode=lock ? 1:0;
+};
+keyboard.checkShiftKeys=function(event){
+	this.capslock=event.getModifierState("CapsLock") ? 1:0;
+	this.numlock=event.getModifierState("NumLock") ? 1:0;
+	this.scrolllock=event.getModifierState("ScrollLock") ? 1:0;
+	this.winkey=event.getModifierState("OS") ? 1:0;
+	this.altkey=event.getModifierState("Alt") ? 1:0;
+	this.ctrlkey=event.getModifierState("Control") ? 1:0;
+	this.shiftkey=event.getModifierState("Shift") ? 1:0;
+};
+keyboard.keydown=function(code,event){
+	this.checkShiftKeys(event);
+	this.keyArray.push(code);
+	var status=system.pPs2keystatus;
+	if (status) {
+		system.write8(status+code,1);
 	}
 };
 keyboard.keyup=function(code,event){
-	switch(code){
-		case 0x10: // Shift
-			this.shiftkey=0;
-			return;
-		case 0x14: // CapsLock
-			this.capslock=event.getModifierState("CapsLock") ? 1:0;
-			return;
-		case 0x15: // KanaMode
-			this.kanamode=event.getModifierState("KanaMode") ? 1:0;
-			return;
-		default:
-			return;
+	this.checkShiftKeys(event);
+	var status=system.pPs2keystatus;
+	if (status) {
+		system.write8(status+code,0);
 	}
 };
 keyboard.convertCode=function(code){

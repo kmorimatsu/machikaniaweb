@@ -522,23 +522,19 @@ extern int g_int_vector[];
 #define rem8_32(x) ((x)&0x07)
 
 // Divide by 9 (valid for 32 bits)
-//#define div9_32(x) div32(x,0xe38e38e4,35)
-#define div9_32(x) ((x)/9)
+#define div9_32(x) div32(x,0xe38e38e4,35)
 #define rem9_32(x) ((x)-9*div9_32(x))
 
 // Divide by 10 (valid for 32 bits)
-//#define div10_32(x) div32(x,0xcccccccd,35)
-#define div10_32(x) ((x)/10)
+#define div10_32(x) div32(x,0xcccccccd,35)
 #define rem10_32(x) ((x)-10*div10_32(x))
 
 // Divide by 36 (valid for 32 bits)
-//#define div36_32(x) div32(x,0xe38e38e4,37)
-#define div36_32(x) ((x)/36)
+#define div36_32(x) div32(x,0xe38e38e4,37)
 #define rem36_32(x) (x-36*div36_32(x))
 
 // Divide by 37 (valid for 31 bits)
-//#define div37_31(x) div32(x,0xdd67c8a7,37)
-#define div37_31(x) ((x)/37)
+#define div37_31(x) div32(x,0xdd67c8a7,37)
 #define rem37_31(x) (x-37*div37_31(x))
 
 // Check if within RAM

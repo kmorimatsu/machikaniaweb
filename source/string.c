@@ -18,6 +18,37 @@
 #include "api.h"
 #include "compiler.h"
 
+/*
+	Calling outside routines that use stack:
+		str_function()
+		string_obj_field()
+	Before calling these functions, g_sdepth and g_maxsdeph are cleared.
+*/
+
+char* pre_str_function(void){
+	int i,j;
+	char* err;
+	i=g_sdepth;
+	j=g_maxsdepth;
+	g_sdepth=0;
+	err=str_function();
+	g_sdepth=i;
+	g_maxsdepth=j;
+	return err;
+}
+
+char* pre_string_obj_field(void){
+	int i,j;
+	char* err;
+	i=g_sdepth;
+	j=g_maxsdepth;
+	g_sdepth=0;
+	err=string_obj_field();
+	g_sdepth=i;
+	g_maxsdepth=j;
+	return err;
+}
+
 char* simple_string(void){
 	char* err;
 	unsigned char b1,b2;
@@ -86,7 +117,7 @@ char* simple_string(void){
 			// Function
 			// String would be pointed by $v0
 			// Otherwise, it will be assinged in xxx_function() function.
-			err=str_function();
+			err=pre_str_function();
 			if (err) return err;
 			// Temp area would be used when executing.
 			g_temp_area_used=1;
@@ -97,7 +128,7 @@ char* simple_string(void){
 			check_obj_space(1);
 			g_object[g_objpos++]=0x8FC20000|(i*4); // lw v0,xx(s8)
 			g_srcpos++;
-			return string_obj_field();
+			return pre_string_obj_field();
 		} else if (g_source[g_srcpos]=='(') {
 			// An array element contains pointer to an object.
 			g_srcpos++;
@@ -105,7 +136,7 @@ char* simple_string(void){
 			if (err) return err;
 			if (g_source[g_srcpos]!='.') return ERR_SYNTAX;
 			g_srcpos++;
-			return string_obj_field();
+			return pre_string_obj_field();
 		}
 		if (g_source[g_srcpos]!='$') return ERR_SYNTAX;
 		g_srcpos++;

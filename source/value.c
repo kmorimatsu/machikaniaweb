@@ -15,6 +15,37 @@
 
 #include "compiler.h"
 
+/*
+	Calling outside routines that use stack:
+		function()
+		integer_obj_field()
+	Before calling these functions, g_sdepth and g_maxsdeph are cleared.
+*/
+
+char* pre_function(void){
+	int i,j;
+	char* err;
+	i=g_sdepth;
+	j=g_maxsdepth;
+	g_sdepth=0;
+	err=function();
+	g_sdepth=i;
+	g_maxsdepth=j;
+	return err;
+}
+
+char* pre_integer_obj_field(void){
+	int i,j;
+	char* err;
+	i=g_sdepth;
+	j=g_maxsdepth;
+	g_sdepth=0;
+	err=integer_obj_field();
+	g_sdepth=i;
+	g_maxsdepth=j;
+	return err;
+}
+
 char* get_value();
 char* get_value_sub(int pr);
 
@@ -158,7 +189,7 @@ char* get_simple_value(void){
 			i=get_var_number();
 			if (i<0) {
 				// Must be a function.
-				return function();
+				return pre_function();
 			}
 			if (g_source[g_srcpos]=='(') {
 				// Dimension
@@ -174,7 +205,7 @@ char* get_simple_value(void){
 			if (g_source[g_srcpos]=='.') {
 				// This is an object. See the filed of it.
 				g_srcpos++;
-				return integer_obj_field();
+				return pre_integer_obj_field();
 			}
 		}
 	}

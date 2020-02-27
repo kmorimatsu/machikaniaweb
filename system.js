@@ -99,6 +99,7 @@ system.html5functions=function(address,type){
 	#define HTML5FUNC_FSfclose   "14"
 	#define HTML5FUNC_FSfopen    "15"
 	#define HTML5FUNC_FSInit     "16"
+	#define HTML5FUNC_shiftkeys  "17"
 	#define HTML5FUNC_set_palette   "256"
 	#define HTML5FUNC_set_bgcolor   "257"
 	#define HTML5FUNC_set_videomode "258"
@@ -166,6 +167,9 @@ system.html5functions=function(address,type){
 			break;
 		case 16: // FSInit     
 			v0=filesystem.FSInit(a0,a1,a2,a3);
+			break;
+		case 17: // shiftkeys
+			v0=keyboard.shiftkeys(a0,a1,a2,a3);
 			break;
 		case 256: // set_palette
 			// TODO: implement here

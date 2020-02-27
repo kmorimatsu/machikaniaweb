@@ -78,7 +78,7 @@ unsigned char lockkey; // 初期化時にLockキーの状態指定。下位3ビットが<CAPSLK><NU
 unsigned char keytype; // キーボードの種類。0：日本語109キー、1：英語104キー
 
 int ps2init(){ return 0; } // PS/2ライブラリ関連初期化。正常終了0、エラーで-1を返す
-unsigned char shiftkeys(){ return 0; } // SHIFT関連キーの押下状態を返す
+unsigned char shiftkeys(){ html5func(HTML5FUNC_shiftkeys); } // SHIFT関連キーの押下状態を返す
 unsigned char ps2readkey(){ html5func(HTML5FUNC_ps2readkey); }
 // 入力された1つのキーのキーコードをグローバル変数vkeyに格納（押されていなければ0を返す）
 // 下位8ビット：キーコード

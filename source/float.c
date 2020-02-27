@@ -12,6 +12,37 @@
 #include "./compiler.h"
 #include "stdlib.h"
 
+/*
+	Calling outside routines that use stack:
+		float_function()
+		float_obj_field()
+	Before calling these functions, g_sdepth and g_maxsdeph are cleared.
+*/
+
+char* pre_float_function(void){
+	int i,j;
+	char* err;
+	i=g_sdepth;
+	j=g_maxsdepth;
+	g_sdepth=0;
+	err=float_function();
+	g_sdepth=i;
+	g_maxsdepth=j;
+	return err;
+}
+
+char* pre_float_obj_field(void){
+	int i,j;
+	char* err;
+	i=g_sdepth;
+	j=g_maxsdepth;
+	g_sdepth=0;
+	err=float_obj_field();
+	g_sdepth=i;
+	g_maxsdepth=j;
+	return err;
+}
+
 char* get_float_sub(int pr);
 
 char* get_simple_float(void){
@@ -66,14 +97,14 @@ char* get_simple_float(void){
 			i=get_var_number();
 			if (i<0) {
 				// Must be a function.
-				return float_function();
+				return pre_float_function();
 			}
 			if (g_source[g_srcpos]=='.') {
 				// This is an object field or method to return string
 				check_obj_space(1);
 				g_object[g_objpos++]=0x8FC20000|(i*4); // lw v0,xx(s8)
 				g_srcpos++;
-				return float_obj_field();
+				return pre_float_obj_field();
 			} else if (g_source[g_srcpos]=='(') {
 				// An array element contains pointer to an object.
 				g_srcpos++;
@@ -81,7 +112,7 @@ char* get_simple_float(void){
 				if (err) return err;
 				if (g_source[g_srcpos]!='.') return ERR_SYNTAX;
 				g_srcpos++;
-				return float_obj_field();
+				return pre_float_obj_field();
 			}
 			if (g_source[g_srcpos]!='#') return ERR_SYNTAX;
 			g_srcpos++;

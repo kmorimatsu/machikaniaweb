@@ -215,38 +215,44 @@ char* coretimer_statement(){
 */
 
 void BasicInt(int addr,void* memory){
-	// Note that $s0-$s7 and $fp values must be set again here.
+	// Store $s5-$s8 and $ra
+	// Note that $s0-$s4 are not saved here as these are not yet used in MachiKania BASIC
+	asm volatile("#":::"s5");
+	asm volatile("#":::"s6");
+	asm volatile("#":::"s7");
+	asm volatile("#":::"fp");
+	asm volatile("#":::"ra");
+	// Note that $s5-$s7 and $fp values must be set again here.
 	// Set s5 for initial_s5_stack
 	asm volatile("la $s5,%0"::"i"(&g_initial_s5_stack[2]));
 	// Set s7 for easy calling call_library()
 	asm volatile("la $s7,%0"::"i"(&call_library));
 	// Set fp and execute BASIC code at $a0
 	asm volatile("addu $fp,$zero,$a1");
-	asm volatile("jr $a0");
+	asm volatile("jalr $a0");
 }
 #pragma interrupt CS1Handler IPL1SOFT vector 2
 void CS1Handler(void){
 	int i;
-	// Store s0-s7, fp, and ra in stacks
+	// Store s0-s4 and ra in stacks
 	asm volatile("#":::"s0");
 	asm volatile("#":::"s1");
 	asm volatile("#":::"s2");
 	asm volatile("#":::"s3");
 	asm volatile("#":::"s4");
-	asm volatile("#":::"s5");
-	asm volatile("#":::"s6");
-	asm volatile("#":::"s7");
-	asm volatile("#":::"fp");
 	asm volatile("#":::"ra");
-	while(g_interrupt_flags){
+	// Do until all interrupt flags are down
+	do {
 		for(i=0;i<NUM_INTERRUPT_TYPES;i++){
 			if (g_interrupt_flags & (1<<i)) {
-				if (g_int_vector[i]) BasicInt(g_int_vector[i],(void*)(&g_var_mem[0]));
 				g_interrupt_flags &= (1<<i)^0xffff;
+				if (g_int_vector[i]) BasicInt(g_int_vector[i],(void*)(&g_var_mem[0]));
 			}
 		}
-	}
-	IFS0bits.CS1IF=0;
+		// Clear CS1IF again here
+		// Note that if g_interrupt_flags is raised, do loop continues.
+		IFS0bits.CS1IF=0;
+	} while (g_interrupt_flags);
 }
 
 void lib_interrupt_main(int itype, int address){
@@ -314,7 +320,7 @@ char* interrupt_statement(){
 	check_obj_space(3);
 	g_object[g_objpos++]=0x8FBF0004; // lw          ra,4(sp)
 	g_object[g_objpos++]=0x03E00008; // jr          ra
-	g_object[g_objpos++]=0x08320004; // addiu       sp,sp,4
+	g_object[g_objpos++]=0x27BD0004; // addiu       sp,sp,4
 	// End interrupt-calling region
 	// Complete B assembly
 	g_object[opos]|=g_objpos-opos-1;

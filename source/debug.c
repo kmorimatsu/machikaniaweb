@@ -228,12 +228,18 @@ static const char initext[]=
 "#PRINT\n";
 
 static const char bastext[]=
-"USECLASS CLASS1,CLASS2\n"
-"OPTION FASTFIELD\n"
-"CLS\n"
-"o=new(CLASS1)\n"
-"o.T1=123\n"
-"print o.T2()\n"
+"for a=1 to 30\n"
+"i=coretimer()\n"
+"print b:b=1-b\n"
+"j=coretimer()\n"
+"print j-i\n"
+"next\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
+"\n"
 "\n"
 "\n"
 "\n"
@@ -273,7 +279,7 @@ int _debug_test(int a0, int a1, int a2, int a3, int param4, int param5){
 	asm volatile("bne $v0,$zero,loop");
 	asm volatile("addi $v0,$v0,-1");
 	asm volatile("wait");
-	asm volatile("nop");
+	asm volatile("lw $sp,0($s8)");
 	asm volatile("nop");
 	asm volatile("nop");
 	asm volatile("nop");

@@ -46,13 +46,15 @@ void dumpMemory(){}
 
 void _general_exception_handler_main (void);
 void _general_exception_handler (void){
-	asm volatile("la $sp,%0"::"i"(&RAM[RAMSIZE-4]));
+	//asm volatile("la $sp,%0"::"i"(&RAM[RAMSIZE-4]));
 	asm volatile("j _general_exception_handler_main");
 }
 void _general_exception_handler_main (void){
 	int i;
 	// $v1 is g_ex_data
 	asm volatile("la $v1,%0"::"i"(&g_ex_data[0]));
+	// g_ex_data[5]=$sp
+	asm volatile("sw $sp,20($v1)");
 	// Prepare proper stack area before SoftReset
 	asm volatile("addiu $sp,$v1,0xfff0");
 	// g_ex_data[2]=$s6
@@ -91,7 +93,7 @@ void _general_exception_handler_main (void){
 }
 
 void blue_screen(void){
-	int i,j,s6,s6g;
+	int i,j,s6,s6g,sp;
 	unsigned int* opos;
 	if (RCONbits.POR || RCONbits.EXTR) {
 		// After power on or reset. Reset flags and return.
@@ -108,6 +110,7 @@ void blue_screen(void){
 	}
 	// Exception occured before SoftReset().
 	// Prepare data
+	sp=g_ex_data[5];
 	s6=g_ex_data[2];
 	s6g=g_ex_data[1];
 	s6=s6&0x7fffffff;
@@ -143,6 +146,8 @@ void blue_screen(void){
 	printstr(resolve_label(s6));
 	printstr("\n       g_s6: ");
 	printstr(resolve_label(s6g));
+	printstr("\n         sp: ");
+	printhex32(g_ex_data[5]);
 	printstr("\n");
 	printstr("Reset MachiKania to contine.\n\n");
 	// Show code where the exception happened.
