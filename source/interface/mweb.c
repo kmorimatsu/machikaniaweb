@@ -35,6 +35,7 @@ const unsigned int _debug_boot[] __attribute__((address(0xBFC00000))) ={
 const unsigned int _html5_data[] __attribute__((address(0x9D006000))) ={
 	(unsigned int)(&TVRAM[0]),
 	(unsigned int)(&FontData[0]),
+	(unsigned int)(&FontData2[0]),
 	(unsigned int)(&html5data[0]),
 	(unsigned int)(&ps2keystatus[0]),
 	(unsigned int)(&vkey),

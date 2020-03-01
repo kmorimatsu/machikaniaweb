@@ -7,7 +7,7 @@
 // Initialize system
 hexfile.load();
 system.init();
-display.init(system.pFontData);
+display.init(system.pFontData,system.pFontData2);
 display.all();
 system.reset('MACHIKAM.HEX');
 // Show display every 40 msec (25 frames/sec)

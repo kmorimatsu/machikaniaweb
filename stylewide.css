@@ -6,10 +6,10 @@
 
 body {
 	background: #404040;
-	width: 980px;
+	width: 1460px;
 }
 .main {
-	width: 480px;
+	width: 960px;
 	float: left;
 }
 .side {
@@ -21,11 +21,11 @@ body {
 }
 .buttons{
 	background: #fff;
-	width: 480px;
+	width: 960px;
 }
 .basicsource{
 	font-family: monospace;
-	width: 480px;
+	width: 960px;
 	height: 100px;
 }
 .help{
