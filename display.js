@@ -35,7 +35,7 @@ display.font=new Array(256);
 display.font2=new Array(256);
 display.prevview=new Array();
 display.width=36;
-display.wide=document.baseURI.replace(/^.*([a-z]{4})\.[a-z]+$/,"$1")=='wide' ?1:0;
+display.wide=0;
 display.init=function(FontData,FontData2){
 	var wide=this.wide+1;
 	// Set the contexts.
