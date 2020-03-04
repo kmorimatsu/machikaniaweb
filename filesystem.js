@@ -82,12 +82,17 @@ filesystem.fhandle0file=0;
 filesystem.fhandle1file=0;
 filesystem.root=new Array();
 filesystem.root["LIB"]=new Array();
+filesystem.root["LIB"]["TEST"]="#TEST\n";
 filesystem.root["MACHIKAM.INI"]="#\n#\n";
 filesystem.root["TEST.BAS"]=(function(){/*
-WIDTH 36
-PRINT "1________2________";
-REM PRINT "1________";
-PRINT 3,
+useclass TEST
+o=new(TEST)
+o.HELLO()
+
+option classcode
+method HELLO
+ print "Hello World!"
+return
 */}).toString().match(/\/\*([\s\S]*)\*\//)[1];
 filesystem.curdir=filesystem.root;
 filesystem.curdirpath='\\';
@@ -429,4 +434,77 @@ filesystem.FSremove=function(fileName){
 filesystem.FSrename=function(fileName,fo){
 //int FSrename (const char * fileName, FSFILE * fo);
 alert('rename');
+};
+/*
+	Disk system - Zip archive handling routines follow
+*/
+filesystem.saveLink=function(obj){
+	// Construct ZIP archive
+	var zip = new JSZip();
+	// Construct recursive function
+	var explore=function(dir,zip){
+		var file;
+		for(file in dir){
+			if (Array.isArray(dir[file])) {
+				explore(dir[file],zip.folder(file));
+			} else {
+				zip.file(file,dir[file]);
+			}
+		}
+	};
+	// Construct ZIP object
+	explore(this.root,zip);
+	// Prepare to download
+	var data="data:application/zip;base64,";
+	data+=zip.generate({type:"base64",compression: "DEFLATE"});
+	// Update href property of a tag
+	obj.href=data;
+	obj.click();
+};
+filesystem.setFile=function(obj){
+	// Show the dialog to upload local file.
+	obj.click();
+};
+filesystem.loaded=function(obj){
+	// This will be called when a file is uploaded.
+	// If FileReader API is not supported, following code will fail.
+	var fr = new FileReader();
+	fr.onload = function () {
+		var data=new Uint8Array(fr.result);
+		filesystem.update(data);
+	};
+	this.name=obj.files[0].name;
+	fr.readAsArrayBuffer(obj.files[0]);
+};
+filesystem.update=function(data){
+	// This will be called when a file is sucessfully loaded by FileReader API.
+	// Data will be given as an array
+	// Check if ZIP archive.
+	if (data[0]==0x50 && data[1]==0x4B && data[2]==0x03 && data[3]==0x04) {
+		this.loadZip(new JSZip(data));
+	} else {
+		alert("Not Zip archive!");
+	}
+};
+filesystem.loadZip=function(zip){
+	var file,m;
+	// Construt empty disk
+	var root=new Array();
+	// Function to explore ZIP archive
+	var explore=function(filename,dir,contents){
+		filename=filename.toUpperCase();
+		m=filename.match(/^([^\/]+)\/(.*)$/);
+		if (m) {
+			if (!Array.isArray(dir[m[1]])) dir[m[1]]=new Array();
+			if (m[2].length) explore(m[2],dir[m[1]],contents);
+		} else {
+			dir[filename]=contents.asText();
+		}
+	};
+	// List up all files in ZIP archive and store in the disk image
+	for(file in zip.files){
+		explore(file,root,zip.file(file));
+	}
+	// Replace disk image in file system
+	this.root=root;
 };

@@ -28,6 +28,9 @@ body {
 	width: 480px;
 	height: 100px;
 }
+.debug, .hidden {
+	display:none;
+}
 .help{
 	font-family: monospace;
 	width: 500px;

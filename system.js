@@ -29,6 +29,7 @@ P_CONFIG_BASE_ADDRESS       =0x1FC02FF0;
 P_CONFIG_END_ADDRESS        =0x1FC02FFF;
 
 system=new Object();
+system.note='';
 // Memory areas
 system.RAM=new Array();
 system.FLASH=new Array();
@@ -324,6 +325,7 @@ system.log=function(text){
 	text+=" at PC:0x"+(mips32.pc-4).toString(16);
 	try{
 		console.log(text);
+		console.log(this.note);
 	}catch(e){
 		try{
 			alert(text);

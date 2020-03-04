@@ -58,7 +58,8 @@ main=function(maxspeed,breakpoint){
 			interrupt.check();
 			// Check halt state
 			if (mips32.checkHalt()||system.exceptionFlag||mips32.pc==breakpoint) {
-				//mips32.logreg();
+				mips32.cp0.DI();
+				mips32.logreg();
 				dom.getElement("debug").style.display="block";
 			} else {
 				msec=32-msec;
@@ -85,6 +86,7 @@ steprun=function(codenum){
 	t+=system.read32(mips32.pc).toString(16);
 	t+=')';
 	dom.log(t);
+	mips32.logreg();
 };
 breakat=function(breakpoint){
 	main(95454.533*16,breakpoint);// 95.4545 MHz
@@ -110,5 +112,5 @@ dump=function(address){
 if (get.debug) {
 	dom.getElement("debug").style.display="block";
 } else {
-	main(95454.533*16,0);// 95.4545 MHz
+	main(95454.533*16,get.breakpoint);// 95.4545 MHz
 }

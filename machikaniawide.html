@@ -13,6 +13,7 @@
 	<!-- Load javascript fies -->
 	<script type="text/javascript" src="./get.js"></script>
 	<script type="text/javascript" src="./dom.js"></script>
+	<script type="text/javascript" src="./jszip.js"></script>
 	<script type="text/javascript" src="./display.js"></script>
 	<script type="text/javascript">display.wide=1;</script>
 	<script type="text/javascript" src="./keyboard.js"></script>
@@ -25,7 +26,7 @@
 	<script type="text/javascript" src="./mips32.js"></script>
 	<script type="text/javascript" src="./mips32cp0.js"></script>
 	<script type="text/javascript" src="./hexfile.js"></script>
-	<title>MachiKania web v0.2</title>
+	<title>MachiKania web v0.2.5</title>
 </head>
 <body>
 	<div class="side" id="side">
@@ -39,6 +40,15 @@
 		<!-- Debug buttons -->
 		<div class="buttons">
 			<span id="speed"><!--clock: 0 hz--></span><br />
+			<!-- File upload input -->
+			<input class="hidden" id="load" type="file" onchange="filesystem.loaded(this);" />
+			<!-- File upload button -->
+			<input type="button" value="Load Disk Image" onclick="filesystem.setFile(document.getElementById('load'));" />
+			<!-- File download link -->
+			<input type="button" value="Save Disk Image" id="savebutton" onclick="
+				filesystem.saveLink(document.getElementById('save'));
+			" />
+			<a class="hidden" id="save" href="#" download="mwebdisk.zip">Save Disk Image</a><br />
 			<input id="KanaLock" value="KanaLock" type="button" onclick="button.kanalock(this);" /><br />
 			<input id="Sbutton" value="S" type="button" ontouchstart="button.start(1);" ontouchend="button.start(0);" onmousedown="button.start(1);" onmouseout="button.start(0);" onmouseup="button.start(0);"/>
 			<input id="Fbutton" value="F" type="button" ontouchstart="button.fire(1);" ontouchend="button.fire(0);" onmousedown="button.fire(1);" onmouseout="button.fire(0);" onmouseup="button.fire(0);"/>
@@ -47,9 +57,9 @@
 			<input id="Dbutton" value="↓" type="button" ontouchstart="button.down(1);" ontouchend="button.down(0);" onmousedown="button.down(1);" onmouseout="button.down(0);" onmouseup="button.down(0);"/>
 			<input id="Rbutton" value="→" type="button" ontouchstart="button.right(1);" ontouchend="button.right(0);" onmousedown="button.right(1);" onmouseout="button.right(0);" onmouseup="button.right(0);"/>
 		</div>
-		<div id="debug" class="buttons" style="display:none;">
+		<div id="debug" class="debug">
 			<!-- debug -->
-			<input id="stepnum" value="100000" type="text" />
+			<input id="stepnum" value="1" type="text" />
 			<input id="step" value="STEP" type="button" onclick="steprun(dom.getElement('stepnum').value);"/><br />
 			<input id="goto" value="RUN TO" type="button" onclick="breakat(dom.getElement('breakat').value);"/>
 			<input id="breakat" value="0x9D007000" type="text" /><br />

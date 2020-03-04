@@ -501,7 +501,7 @@ mips32.commandsSp3=[
 	"void",      //011101
 	"void",      //011110
 	"void",      //011111
-	"void",      //100000
+	"execBSHFL", //100000
 	"void",      //100001
 	"void",      //100010
 	"void",      //100011
@@ -616,7 +616,41 @@ mips32.commandsCp0Rs=[
 	"void",      //01100
 	"void",      //01101
 	"WRPGPR",    //01110
-	"void",      //01!11
+	"void",      //01111
+];
+mips32.commandsBSHFL=[
+	"void",      //00000
+	"void",      //00001
+	"WSBH",      //00010
+	"void",      //00011
+	"void",      //00100
+	"void",      //00101
+	"void",      //00110
+	"void",      //00111
+	"void",      //01000
+	"void",      //01001
+	"void",      //01010
+	"void",      //01011
+	"void",      //01100
+	"void",      //01101
+	"void",      //01110
+	"void",      //01111
+	"SEB",       //10000
+	"void",      //10001
+	"void",      //10010
+	"void",      //10011
+	"void",      //10100
+	"void",      //10101
+	"void",      //10110
+	"void",      //10111
+	"SEH",       //11000
+	"void",      //11001
+	"void",      //11010
+	"void",      //11011
+	"void",      //11100
+	"void",      //11101
+	"void",      //11110
+	"void",      //11111
 ];
 mips32.execSpecial=function(){
 	return this[this.commandsSp[this.mnl]]();
@@ -644,6 +678,9 @@ mips32.execSpecial2=function(){
 };
 mips32.execSpecial3=function(){
 	return this[this.commandsSp3[this.mnl]]();
+};
+mips32.execBSHFL=function(){
+	return this[this.commandsBSHFL[this.sa]]();
 };
 mips32.ADD=function(){
 	var rs=this.GPR.signed(this.rs);
@@ -1106,13 +1143,27 @@ mips32.SB=function(){
 };
 mips32.SC=function(){this.log("SC");};
 mips32.SDBBP=function(){this.log("SDBBP");};
+mips32.SEB=function(){
+	var rt=this.GPR(this.rt);
+	var rd;
+	rd=(rt&0x00000080) ? 0xffffff00 : 0x00000000;
+	rd|=rt&0x000000ff;
+	this.GPR.set(this.rd,rd);
+};
+mips32.SEH=function(){
+	var rt=this.GPR(this.rt);
+	var rd;
+	rd=(rt&0x00008000) ? 0xffff0000 : 0x00000000;
+	rd|=rt&0x0000ffff;
+	this.GPR.set(this.rd,rd);
+};
 mips32.SH=function(){
 	var rs=this.GPR(this.rs);
 	var rt=this.GPR(this.rt);
 	system.write16(rs+this.signed16,rt&0x0000ffff);
 };
 mips32.SLL=function(){
-	var rt=this.GPR(this.rt);
+	var rt=this.GPR.unsigned(this.rt);
 	var sa=this.sa;
 	var rd=rt<<sa;
 	this.GPR.set(this.rd,rd);
@@ -1172,12 +1223,22 @@ mips32.SRAV=function(){
 mips32.SRL=function(){
 	var rt=this.GPR.unsigned(this.rt);
 	var sa=this.sa;
+	if (sa) {
+		rt>>=1;
+		rt&=0x7fffffff;
+		sa--;
+	}
 	var rd=rt>>sa;
 	this.GPR.set(this.rd,rd);
 };
 mips32.SRLV=function(){
 	var rt=this.GPR(this.rt);
 	var rs=this.GPR(this.sa);
+	if (rs) {
+		rt>>=1;
+		rt&=0x7fffffff;
+		rs--;
+	}
 	var rd=rt>>rs;
 	this.GPR.set(this.rd,rd);
 };
@@ -1286,6 +1347,15 @@ mips32.WAIT=function(){
 mips32.WRPGPR=function(){
 	// Shadow register is not supported
 	if (this.rd!=this.rt) this.log("WRPGPR "+this.rd +" "+this.rt);
+};
+mips32.WSBH=function(){
+	var rt=this.GPR.signed(this.rt);
+	var rd=0;
+	rd|=(rt&0x00ff0000)<<8;
+	rd|=(rt&0xff000000)>>8;
+	rd|=(rt&0x000000ff)<<8;
+	rd|=(rt&0x0000ff00)>>8;
+	this.GPR.set(this.rd,rd);
 };
 mips32.XOR=function(){
 	var rs=this.GPR(this.rs);
