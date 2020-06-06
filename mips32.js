@@ -107,7 +107,7 @@ mips32.logreg=function(){
 		return ('0000000'+res).substr(-8);
 	};
 	var text="";
-	text+="$pc:0x"+this.pc.toString(16)+"\n";
+	text+="$pc:0x"+hex8(this.pc)+"\n";
 	text+="$zr:"+hex8(this.GPR(0));
 	text+=" $at:"+hex8(this.GPR(1));
 	text+=" $v0:"+hex8(this.GPR(2));
@@ -1065,8 +1065,8 @@ mips32.MUL=function(){
 	this.GPR.set(this.rd,rd);
 };
 mips32.MULT=function(){
-	var rs=this.GPR(this.rs);
-	var rt=this.GPR(this.rt);
+	var rs=this.GPR.unsigned(this.rs);
+	var rt=this.GPR.unsigned(this.rt);
 	// Calculate with unsigned values
 	var sign=1;
 	if (rs&0x80000000) {
@@ -1078,14 +1078,14 @@ mips32.MULT=function(){
 		sign=-sign;
 	}
 	// Main calculation routine
-	var rsh=rs>>16;
+	var rsh=(rs>>16)&0xffff;
 	var rsl=rs&0xffff;
-	var rth=rt>>16;
+	var rth=(rt>>16)&0xffff;
 	var rtl=rt&0xffff;
 	var lo=rsl*rtl;
-	var mid=rsh*rtl+rsl*rth+(lo>>16);
+	var mid=rsh*rtl+rsl*rth+((lo>>16)&0xffff);
 	lo=(lo&0xffff)|((mid&0xffff)<<16);
-	var hi=rsh*rth+(mid>>16);
+	var hi=rsh*rth+((mid>>16)&0xffff);
 	// Consider sign
 	if (sign<0) {
 		if (lo==0) {
@@ -1100,16 +1100,16 @@ mips32.MULT=function(){
 	this.LO(lo);
 };
 mips32.MULTU=function(){
-	var rs=this.GPR(this.rs);
-	var rt=this.GPR(this.rt);
-	var rsh=rs>>16;
+	var rs=this.GPR.unsigned(this.rs);
+	var rt=this.GPR.unsigned(this.rt);
+	var rsh=(rs>>16)&0xffff;
 	var rsl=rs&0xffff;
-	var rth=rt>>16;
+	var rth=(rt>>16)&0xffff;
 	var rtl=rt&0xffff;
 	var lo=rsl*rtl;
-	var mid=rsh*rtl+rsl*rth+(lo>>16);
+	var mid=rsh*rtl+rsl*rth+((lo>>16)&0xffff);
 	lo=(lo&0xffff)|((mid&0xffff)<<16);
-	var hi=rsh*rth+(mid>>16);
+	var hi=rsh*rth+((mid>>16)&0xffff);
 	this.HI(hi);
 	this.LO(lo);
 };
@@ -1233,7 +1233,7 @@ mips32.SRL=function(){
 };
 mips32.SRLV=function(){
 	var rt=this.GPR(this.rt);
-	var rs=this.GPR(this.sa);
+	var rs=this.GPR(this.rs);
 	if (rs) {
 		rt>>=1;
 		rt&=0x7fffffff;

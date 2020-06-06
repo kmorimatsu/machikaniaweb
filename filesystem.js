@@ -84,15 +84,13 @@ filesystem.root=new Array();
 filesystem.root["LIB"]=new Array();
 filesystem.root["LIB"]["TEST"]="#TEST\n";
 filesystem.root["MACHIKAM.INI"]="#\n#\n";
-filesystem.root["TEST.BAS"]=(function(){/*
-useclass TEST
-o=new(TEST)
-o.HELLO()
-
-option classcode
-method HELLO
- print "Hello World!"
-return
+filesystem.root["TEST.BAS"]=(function(){/*cls
+a#=3.14
+print hex$(a)
+*/}).toString().match(/\/\*([\s\S]*)\*\//)[1];
+filesystem.root["TEST2.BAS"]=(function(){/*cls
+a=0x4048f5c3
+print a#
 */}).toString().match(/\/\*([\s\S]*)\*\//)[1];
 filesystem.curdir=filesystem.root;
 filesystem.curdirpath='\\';
@@ -305,10 +303,10 @@ filesystem.FindFirst=function(fileName,attr,rec){
 		c=fileName.charAt(i);
 		switch(c){
 			case '?':
-				re+='[A-Z_]';
+				re+='[^\\."\\\\/\\[\\]\\:;\\s]';
 				break;
 			case '*':
-				re+='[A-Z_]*';
+				re+='[^\\."\\\\/\\[\\]\\:;\\s]*';
 				break;
 			case '.':
 				re+='\\.';

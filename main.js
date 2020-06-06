@@ -9,7 +9,11 @@ hexfile.load();
 system.init();
 display.init(system.pFontData,system.pFontData2);
 display.all();
-system.reset('MACHIKAM.HEX');
+if (get.debug=='hex') {
+	system.reset('DUMMY.HEX');
+} else {
+	system.reset('MACHIKAM.HEX');
+}
 // Show display every 40 msec (25 frames/sec)
 display.show(40);
 
@@ -78,15 +82,15 @@ steprun=function(codenum){
 			dom.log('wait');
 			break;
 		}
+		var t='PC: 0x';
+		t+=(0>mips32.pc ? mips32.pc+0x100000000 : mips32.pc).toString(16);
+		t+=' (0x';
+		t+=system.read32(mips32.pc).toString(16);
+		t+=')';
+		dom.log(t);
+		mips32.logreg();
 	}
 	display.all();
-	var t='PC: 0x';
-	t+=(0>mips32.pc ? mips32.pc+0x100000000 : mips32.pc).toString(16);
-	t+=' (0x';
-	t+=system.read32(mips32.pc).toString(16);
-	t+=')';
-	dom.log(t);
-	mips32.logreg();
 };
 breakat=function(breakpoint){
 	main(95454.533*16,breakpoint);// 95.4545 MHz

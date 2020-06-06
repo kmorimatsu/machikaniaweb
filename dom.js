@@ -6,12 +6,12 @@
 
 window.onkeydown=function(e){
  	keyboard.keydown(e.keyCode,e);
-	if (get.debug) return true;
+	if (get.debug || get.breakpoint) return true;
 	else return false;
 };
 window.onkeyup=function(e){
  	keyboard.keyup(e.keyCode,e);
-	if (get.debug) return true;
+	if (get.debug || get.breakpoint) return true;
 	else return false;
 };
 
