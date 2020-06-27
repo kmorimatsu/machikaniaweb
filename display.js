@@ -34,48 +34,49 @@ display.fonts=new Image();
 display.font=new Array(256);
 display.font2=new Array(256);
 display.prevview=new Array();
+display.palette=new Array(256);
 display.width=36;
 display.wide=0;
+display.pFontData=0;
+display.pFontData2=0;
+display.context=null;
+display.fontcontext=null;
 display.init=function(FontData,FontData2){
+	var i;
 	var wide=this.wide+1;
 	// Set the contexts.
+	this.fontcontext=dom.getContext("font");
 	this.context=dom.getContext("display");
 	this.context.fillStyle   = "rgb(0, 0, 0)";
 	this.context.fillRect(0,0,480*wide,216*wide);
 	this.context.fillStyle   = "rgb(255, 255, 255)";
-	// Show all fonts first (8 bits width)
+	// Canvas imageData is created when needed in display.all()
+	this.pFontData=FontData;
+	this.pFontData2=FontData2;
+	// Create default palette
 	for(i=0;i<256;i++){
-		for(y=0;y<8;y++){
-			fd=system.read8(FontData+i*8+y);
-			for(x=0;x<8;x++){
-				if (fd & (0x80>>x)) this.context.fillRect(((i&15)*8+x)*wide,((i>>4)*8+y)*wide,wide,wide);
-			}
-		}
-	}
-	// Construction of images for font
-	for (h8=0;h8<16;h8++) {
-		for (l8=0;l8<16;l8++) {
-			this.font[h8*16+l8]=this.context.getImageData(l8*8*wide,h8*8*wide,8*wide,8*wide);
-		}
-	}
-	// Show all fonts first (6 bits width)
-	for(i=0;i<256;i++){
-		for(y=0;y<8;y++){
-			fd=system.read8(FontData2+i*8+y);
-			for(x=0;x<8;x++){
-				if (fd & (0x80>>x)) this.context.fillRect(((i&15)*8+x+128)*wide,((i>>4)*8+y)*wide,wide,wide);
-			}
-		}
-	}
-	// Construction of images for font
-	for (h8=0;h8<16;h8++) {
-		for (l8=0;l8<16;l8++) {
-			this.font2[h8*16+l8]=this.context.getImageData((l8*8+128)*wide,h8*8*wide,6*wide,8*wide);
-		}
+		this.palette[i]=[255,255,255];
 	}
 };
+display.updateFont=function(ascii,pFontData,font,palette){
+	var context=this.fontcontext;
+	var wide=this.wide+1;
+	var fd,x,y;
+	var rgb="rgb("+this.palette[palette][0]+","+this.palette[palette][1]+","+this.palette[palette][2]+")";
+	if (this.width==80) rgb="rgb(255,255,255)";
+	for(y=0;y<8;y++){
+		fd=system.read8(pFontData+ascii*8+y);
+		for(x=0;x<8;x++){
+			if (fd & (0x80>>x)) context.fillStyle=rgb;
+			else context.fillStyle="rgb(0, 0, 0)";
+			context.fillRect(x*wide,y*wide,wide,wide);
+		}
+	}
+	if (!font[palette]) font[palette]=Array(256);
+	font[palette][ascii]=context.getImageData(0,0,8*wide,8*wide);
+};
 display.all=function(){
-	var data,posy,posx,addr;
+	var data,palette,pdata,posy,posx,addr,ascii;
 	var wide=this.wide;
 	switch(this.width){
 		case 40: case 64: case 80: // 6 dots width
@@ -84,8 +85,17 @@ display.all=function(){
 					addr=posy*this.width+posx;
 					if ((addr&3)==0) {
 						data=system.read32(system.pTVRAM+addr);
+						if (this.width==80) pdata=0;
+						else pdata=system.read32(system.pTVRAM+this.width*27+addr);
 					}
-					this.context.putImageData(this.font2[(data>>((addr&3)*8))&255],posx*6<<wide,posy<<(3+wide));
+					ascii=(data>>((addr&3)*8))&255;
+					palette=(pdata>>((addr&3)*8))&255
+					if (!this.font2[palette]) {
+						this.updateFont(ascii,this.pFontData2,this.font2,palette);
+					} else if (!this.font2[palette][ascii]) {
+						this.updateFont(ascii,this.pFontData2,this.font2,palette);
+					}
+					this.context.putImageData(this.font2[palette][ascii],posx*6<<wide,posy<<(3+wide));
 				}
 			}
 			break;
@@ -95,8 +105,16 @@ display.all=function(){
 					addr=posy*this.width+posx;
 					if ((addr&3)==0) {
 						data=system.read32(system.pTVRAM+addr);
+						pdata=system.read32(system.pTVRAM+this.width*27+addr);
 					}
-					this.context.putImageData(this.font[(data>>((addr&3)*8))&255],posx<<(3+wide),posy<<(3+wide));
+					ascii=(data>>((addr&3)*8))&255;
+					palette=(pdata>>((addr&3)*8))&255
+					if (!this.font[palette]) {
+						this.updateFont(ascii,this.pFontData,this.font,palette);
+					} else if (!this.font[palette][ascii]) {
+						this.updateFont(ascii,this.pFontData,this.font,palette);
+					}
+					this.context.putImageData(this.font[palette][ascii],posx<<(3+wide),posy<<(3+wide));
 				}
 			}
 			break;
@@ -155,4 +173,11 @@ display.set_videomode=function(mode,gvram){
 	// Clear screen
 	this.context.fillStyle   = "rgb(0, 0, 0)";
 	this.context.fillRect(0,0,480*(this.wide+1),216*(this.wide+1));
-}
+};
+display.set_palette=function(n,b,r,g){
+	// Update palette array
+	this.palette[n]=[r,g,b];
+	// Clear font image
+	this.font[n]=Array(256);
+	this.font2[n]=Array(256);
+};

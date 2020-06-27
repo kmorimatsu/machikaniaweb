@@ -85,7 +85,7 @@ steprun=function(codenum){
 		var t='PC: 0x';
 		t+=(0>mips32.pc ? mips32.pc+0x100000000 : mips32.pc).toString(16);
 		t+=' (0x';
-		t+=system.read32(mips32.pc).toString(16);
+		t+=system.read32(mips32.pc,"nonexec").toString(16);
 		t+=')';
 		dom.log(t);
 		mips32.logreg();
