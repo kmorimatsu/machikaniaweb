@@ -184,11 +184,9 @@ system.html5functions=function(address,type){
 			display.set_palette(a0,a1,a2,a3);
 			break;
 		case 257: // set_bgcolor
-			// TODO: implement here
-			//alert('set_bgcolor');
+			display.set_bgcolor(a0,a1,a2)
 			break;
 		case 258: // set_videomode
-			// TODO: implement here
 			display.set_videomode(a0,a1);
 			break;
 		default:
@@ -321,6 +319,22 @@ system.write16=function(address,data){
 			break;
 	}
 	this.write32(address&0xFFFFFFFC,data);
+};
+system.readRAM8=function(address){
+	address=parseInt(address)&0xffffff;
+	var data=this.unsigned32(this.RAM[address>>2]);
+	switch(address&3){
+		// Little endian
+		case 0:
+			return data&0xff
+		case 1:
+			return (data>>8)&0xff
+		case 2:
+			return (data>>16)&0xff
+		case 3:
+		default:
+			return (data>>24)&0xff
+	}
 };
 system.log=function(text){
 	text+=" at PC:0x"+(mips32.pc-4).toString(16);

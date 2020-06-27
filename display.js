@@ -35,6 +35,7 @@ display.font=new Array(256);
 display.font2=new Array(256);
 display.prevview=new Array();
 display.palette=new Array(256);
+display.bgcolor=[0,0,0];
 display.width=36;
 display.wide=0;
 display.pFontData=0;
@@ -47,7 +48,7 @@ display.init=function(FontData,FontData2){
 	// Set the contexts.
 	this.fontcontext=dom.getContext("font");
 	this.context=dom.getContext("display");
-	this.context.fillStyle   = "rgb(0, 0, 0)";
+	this.context.fillStyle   = "rgb(64, 64, 64)";
 	this.context.fillRect(0,0,480*wide,216*wide);
 	this.context.fillStyle   = "rgb(255, 255, 255)";
 	// Canvas imageData is created when needed in display.all()
@@ -63,12 +64,15 @@ display.updateFont=function(ascii,pFontData,font,palette){
 	var wide=this.wide+1;
 	var fd,x,y;
 	var rgb="rgb("+this.palette[palette][0]+","+this.palette[palette][1]+","+this.palette[palette][2]+")";
-	if (this.width==80) rgb="rgb(255,255,255)";
+	var bgrgb="rgb("+this.bgcolor[0]+","+this.bgcolor[1]+","+this.bgcolor[2]+")";
+	if (this.width==80) {
+		rgb="rgb(255,255,255)";
+		bgrgb="rgb(0,0,0)";
+	}
 	for(y=0;y<8;y++){
 		fd=system.read8(pFontData+ascii*8+y);
 		for(x=0;x<8;x++){
-			if (fd & (0x80>>x)) context.fillStyle=rgb;
-			else context.fillStyle="rgb(0, 0, 0)";
+			context.fillStyle=(fd & (0x80>>x)) ? rgb:bgrgb;
 			context.fillRect(x*wide,y*wide,wide,wide);
 		}
 	}
@@ -83,13 +87,8 @@ display.all=function(){
 			for (posy=0;posy<27;posy++) {
 				for (posx=0;posx<this.width;posx++) {
 					addr=posy*this.width+posx;
-					if ((addr&3)==0) {
-						data=system.read32(system.pTVRAM+addr);
-						if (this.width==80) pdata=0;
-						else pdata=system.read32(system.pTVRAM+this.width*27+addr);
-					}
-					ascii=(data>>((addr&3)*8))&255;
-					palette=(pdata>>((addr&3)*8))&255
+					ascii=system.readRAM8(system.pTVRAM+addr);
+					palette=system.readRAM8(system.pTVRAM+this.width*27+addr);
 					if (!this.font2[palette]) {
 						this.updateFont(ascii,this.pFontData2,this.font2,palette);
 					} else if (!this.font2[palette][ascii]) {
@@ -103,12 +102,8 @@ display.all=function(){
 			for (posy=0;posy<27;posy++) {
 				for (posx=0;posx<this.width;posx++) {
 					addr=posy*this.width+posx;
-					if ((addr&3)==0) {
-						data=system.read32(system.pTVRAM+addr);
-						pdata=system.read32(system.pTVRAM+this.width*27+addr);
-					}
-					ascii=(data>>((addr&3)*8))&255;
-					palette=(pdata>>((addr&3)*8))&255
+					ascii=system.readRAM8(system.pTVRAM+addr);
+					palette=system.readRAM8(system.pTVRAM+this.width*27+addr);
 					if (!this.font[palette]) {
 						this.updateFont(ascii,this.pFontData,this.font,palette);
 					} else if (!this.font[palette][ascii]) {
@@ -171,7 +166,7 @@ display.set_videomode=function(mode,gvram){
 			return 0;
 	}
 	// Clear screen
-	this.context.fillStyle   = "rgb(0, 0, 0)";
+	this.context.fillStyle   = "rgb(64, 64, 64)";
 	this.context.fillRect(0,0,480*(this.wide+1),216*(this.wide+1));
 };
 display.set_palette=function(n,b,r,g){
@@ -180,4 +175,11 @@ display.set_palette=function(n,b,r,g){
 	// Clear font image
 	this.font[n]=Array(256);
 	this.font2[n]=Array(256);
+};
+display.set_bgcolor=function(b,r,g){
+	// Update bgcolor
+	this.bgcolor=[r,g,b];
+	// Clear font image
+	this.font=Array(256);
+	this.font2=Array(256);
 };
