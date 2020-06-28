@@ -7,7 +7,8 @@ extern const unsigned int _html5_func[];
 #define html5func(x) \
 	asm volatile("addu $v1,$ra,$zero"); \
 	asm volatile("ori $v0,$zero," x ); \
-	asm volatile("jal _html5_func")
+	asm volatile("jal _html5_func");
+
 //*/
 #define HTML5FUNC_ps2readkey "0"
 #define HTML5FUNC_FindFirst  "1"

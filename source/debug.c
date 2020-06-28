@@ -228,17 +228,10 @@ static const char initext[]=
 "#PRINT\n";
 
 static const char bastext[]=
-"gosub test\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n";
+"cls\r\n"
+"a=0x4048f5c3\r\n"
+"print a#\r\n"
+"\r\n";
 
 static const char class1text[]=
 "FIELD T1\n"

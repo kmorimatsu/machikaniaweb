@@ -7497,13 +7497,21 @@ void set_videomode(unsigned char m, unsigned char *gvram){
 
 	if(videomode==m) return;
 	stop_composite();
-	if((videomode!=VMODE_T40 && videomode!=VMODE_WIDETEXT6dot) && (m==VMODE_T40 || m==VMODE_WIDETEXT6dot)){
+/* Begin modification for MachiKania web */
+//	if((videomode!=VMODE_T40 && videomode!=VMODE_WIDETEXT6dot) && (m==VMODE_T40 || m==VMODE_WIDETEXT6dot)){
+	if((videomode!=VMODE_T40 && videomode!=VMODE_WIDETEXT6dot && videomode!=VMODE_MONOTEXT) 
+			&& (m==VMODE_T40 || m==VMODE_WIDETEXT6dot || m==VMODE_MONOTEXT)){
+// End insertion for MachiKania web */
 		//6ドットフォントに切り替え
 		fontROMp=(unsigned int *)FontData2;
 		fontRAMp=(unsigned int *)fontdata;
 		for(i=0;i<256*8/4;i++) *fontRAMp++=*fontROMp++;
 	}
-	else if((videomode==VMODE_T40 || videomode==VMODE_WIDETEXT6dot) && (m!=VMODE_T40 && m!=VMODE_WIDETEXT6dot)){
+/* Begin modification for MachiKania web */
+//	else if((videomode==VMODE_T40 || videomode==VMODE_WIDETEXT6dot) && (m!=VMODE_T40 && m!=VMODE_WIDETEXT6dot)){
+	else if((videomode==VMODE_T40 || videomode==VMODE_WIDETEXT6dot || videomode==VMODE_MONOTEXT) 
+			&& (m!=VMODE_T40 && m!=VMODE_WIDETEXT6dot && m!=VMODE_MONOTEXT)){
+// End insertion for MachiKania web */
 		//8ドットフォントに切り替え
 		fontROMp=(unsigned int *)FontData;
 		fontRAMp=(unsigned int *)fontdata;

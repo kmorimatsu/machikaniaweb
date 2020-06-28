@@ -59,7 +59,7 @@ display.init=function(FontData,FontData2){
 		this.palette[i]=[255,255,255];
 	}
 };
-display.updateFont=function(ascii,pFontData,font,palette){
+display.updateFont=function(ascii,pFontData,font,palette,width){
 	var context=this.fontcontext;
 	var wide=this.wide+1;
 	var fd,x,y;
@@ -77,11 +77,19 @@ display.updateFont=function(ascii,pFontData,font,palette){
 		}
 	}
 	if (!font[palette]) font[palette]=Array(256);
-	font[palette][ascii]=context.getImageData(0,0,8*wide,8*wide);
+	font[palette][ascii]=context.getImageData(0,0,width*wide,8*wide);
 };
 display.all=function(){
 	var data,palette,pdata,posy,posx,addr,ascii;
 	var wide=this.wide;
+	var Fontp=system.read32(system.pFontp);
+	if (!Fontp) return;
+	if (Fontp!=this.Fontp){
+		// Font changed. Discard cached font images.
+		this.Fontp=Fontp;
+		this.font=Array(256);
+		this.font2=Array(256);
+	}
 	switch(this.width){
 		case 40: case 64: case 80: // 6 dots width
 			for (posy=0;posy<27;posy++) {
@@ -90,9 +98,9 @@ display.all=function(){
 					ascii=system.readRAM8(system.pTVRAM+addr);
 					palette=system.readRAM8(system.pTVRAM+this.width*27+addr);
 					if (!this.font2[palette]) {
-						this.updateFont(ascii,this.pFontData2,this.font2,palette);
+						this.updateFont(ascii,Fontp,this.font2,palette,6);
 					} else if (!this.font2[palette][ascii]) {
-						this.updateFont(ascii,this.pFontData2,this.font2,palette);
+						this.updateFont(ascii,Fontp,this.font2,palette,6);
 					}
 					this.context.putImageData(this.font2[palette][ascii],posx*6<<wide,posy<<(3+wide));
 				}
@@ -105,9 +113,11 @@ display.all=function(){
 					ascii=system.readRAM8(system.pTVRAM+addr);
 					palette=system.readRAM8(system.pTVRAM+this.width*27+addr);
 					if (!this.font[palette]) {
-						this.updateFont(ascii,this.pFontData,this.font,palette);
+						//this.updateFont(ascii,this.pFontData,this.font,palette);
+						this.updateFont(ascii,Fontp,this.font,palette,8);
 					} else if (!this.font[palette][ascii]) {
-						this.updateFont(ascii,this.pFontData,this.font,palette);
+						//this.updateFont(ascii,this.pFontData,this.font,palette);
+						this.updateFont(ascii,Fontp,this.font,palette,8);
 					}
 					this.context.putImageData(this.font[palette][ascii],posx<<(3+wide),posy<<(3+wide));
 				}
@@ -168,6 +178,9 @@ display.set_videomode=function(mode,gvram){
 	// Clear screen
 	this.context.fillStyle   = "rgb(64, 64, 64)";
 	this.context.fillRect(0,0,480*(this.wide+1),216*(this.wide+1));
+	// Clear font image
+	this.font=Array(256);
+	this.font2=Array(256);
 };
 display.set_palette=function(n,b,r,g){
 	// Update palette array

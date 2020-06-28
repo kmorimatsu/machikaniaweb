@@ -39,6 +39,7 @@ system.CONFIG=new Array();
 system.pTVRAM=0;
 system.pFontData=0;
 system.pFontData2=0;
+system.pFontp=0;
 system.pHtml5data=0;
 system.pPs2keystatus=0;
 system.pVkey=0;
@@ -363,11 +364,12 @@ system.init=function(){
 	this.pTVRAM        = this.read32(0x9d006000);
 	this.pFontData     = this.read32(0x9d006004);
 	this.pFontData2    = this.read32(0x9d006008);
-	this.pHtml5data    = this.read32(0x9d00600C);
-	this.pPs2keystatus = this.read32(0x9d006010); // volatile unsigned char ps2keystatus[256];
-	this.pVkey         = this.read32(0x9d006014); // volatile unsigned short vkey;
-	this.pGFileArray0  = this.read32(0x9d006018); // FSFILE gFileArray[]
-	this.pGFileArray1  = this.read32(0x9d00601C); // FSFILE gFileArray[]
+	this.pFontp        = this.read32(0x9d00600C);
+	this.pHtml5data    = this.read32(0x9d006010);
+	this.pPs2keystatus = this.read32(0x9d006014); // volatile unsigned char ps2keystatus[256];
+	this.pVkey         = this.read32(0x9d006018); // volatile unsigned short vkey;
+	this.pGFileArray0  = this.read32(0x9d00601C); // FSFILE gFileArray[]
+	this.pGFileArray1  = this.read32(0x9d006020); // FSFILE gFileArray[]
 	// Initialize timers
 	this.initTimer(timer1,1,'IFS0<4>');
 	this.initTimer(timer2,2,'IFS0<9>');
