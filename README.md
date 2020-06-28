@@ -6,10 +6,13 @@ MachiKania web is an HTML5 application to run MachiKania type M like PC.
 
 US キーボードワイド画面:
 https://kmorimatsu.github.io/machikania/machikaniawide.html
+
 JP キーボードワイド画面:
 https://kmorimatsu.github.io/machikania/machikaniawide.html?jp=1
+
 US キーボード通常画面:
 https://kmorimatsu.github.io/machikania/machikania.html
+
 JP キーボード通常画面:
 https://kmorimatsu.github.io/machikania/machikania.html?jp=1
 
