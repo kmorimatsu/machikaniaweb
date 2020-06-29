@@ -267,11 +267,11 @@ filesystem.FSfwrite=function(data_to_write,size,n,stream){
 		if (size<seek+n) size=seek+n;
 		fsfile.size.set(stream,size);
 		// Update string in HTML5
-		var result=str.substr(0,seek);
+		var result=str.substring(0,seek);
 		for(var i=0;i<n;i++){
-			result+=String.fromCharCode(system.read8(data_to_write+seek+i));
+			result+=String.fromCharCode(system.read8(data_to_write+i));
 		}
-		result+=str.substr(seek+n);
+		result+=str.substring(seek+n);
 		dir[file]=result;
 		return n;
 	} else {
