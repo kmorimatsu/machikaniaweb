@@ -26,6 +26,7 @@ keyboard.ps2readkey=function(){
 		if (vkey) vkey|=this.shiftkeys()<<8;
 		system.write16(system.pVkey,vkey);
 	}
+	if (vkey & 0x0e00) return 0; // return zero if Win or Alt or Ctrl key is pressed
 	return ascii;
 };
 keyboard.shiftkeys=function(){
