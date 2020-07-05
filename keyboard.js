@@ -53,7 +53,7 @@ keyboard.checkShiftKeys=function(event){
 	this.shiftkey=event.getModifierState("Shift") ? 1:0;
 };
 keyboard.keydown=function(code,event){
-	code=this.dom2ps2[code];
+	if (get.jp) code=this.dom2ps2jp[code];
 	this.checkShiftKeys(event);
 	this.keyArray.push(code);
 	var status=system.pPs2keystatus;
@@ -71,6 +71,7 @@ keyboard.keyup=function(code,event){
 keyboard.convertCode=function(code){
 	var shiftkey=this.shiftkey;
 	if (0x41<=code && code<=0x5a && this.capslock && !this.kanamode) shiftkey=shiftkey ? 0:1;
+	if (0x60<=code && code<=0x6f) shiftkey=this.numlock; // Ten key
 	if (get.jp) {
 		if (this.kanamode) {
 			if (shiftkey) return this.vk2kana2[code];
@@ -99,10 +100,10 @@ keyboard.init=function(){
 		conv(keyboard.vk2asc2_en);
 		conv(keyboard.vk2kana1);
 		conv(keyboard.vk2kana2);
-		conv(keyboard.dom2ps2,1);
+		conv(keyboard.dom2ps2jp,1);
 	}
 };
-keyboard.dom2ps2=[
+keyboard.dom2ps2jp=[
 	// Conversion table from DOM to PS/2 keyboard (required for 109 keyboard)
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
