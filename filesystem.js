@@ -85,13 +85,18 @@ filesystem.root["LIB"]=new Array();
 filesystem.root["LIB"]["TEST"]="#TEST\n";
 filesystem.root["MACHIKAM.INI"]="#\n#\n";
 filesystem.root["TEST.BAS"]=(function(){/*cls
-usegraphic 1
-circlefill 100,100,50,6
+usegraphic 5
+cursor 19,12
+print "Hello World!"
+circlefill 200,100,50,1
 a$=input$()
 */}).toString().match(/\/\*([\s\S]*)\*\//)[1];
 filesystem.root["TEST2.BAS"]=(function(){/*cls
-a=0x4048f5c3
-print a#
+usegraphic 9
+cursor 32,12
+print "Hello World!"
+circlefill 300,100,50,1
+a$=input$()
 */}).toString().match(/\/\*([\s\S]*)\*\//)[1];
 filesystem.curdir=filesystem.root;
 filesystem.curdirpath='\\';

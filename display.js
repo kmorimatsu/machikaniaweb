@@ -34,11 +34,13 @@ display.pFontData=0;
 display.pFontData2=0;
 display.context=null;
 display.fontcontext=null;
+display.fontcanvas=null;
 display.init=function(FontData,FontData2){
 	var i;
 	// Set the contexts.
 	this.fontcontext=dom.getContext("font");
 	this.context=dom.getContext("display");
+	this.fontcanvas=dom.getElement("font");
 	this.cls();
 	// Canvas imageData is created when needed in display.all()
 	this.pFontData=FontData;
@@ -49,14 +51,31 @@ display.init=function(FontData,FontData2){
 	}
 };
 display.updateFont=function(ascii,pFontData,font,palette,width){
+	// This function creates Image object for graphic/text mode,
+	// and ImageData obhect for text-only mpde.
 	var context=this.fontcontext;
 	var wide=this.wide ? 2:1;
 	var fd,x,y;
 	var rgb="rgb("+this.palette[palette][0]+","+this.palette[palette][1]+","+this.palette[palette][2]+")";
-	var bgrgb="rgb("+this.bgcolor[0]+","+this.bgcolor[1]+","+this.bgcolor[2]+")";
-	if (this.width==80) {
-		rgb="rgb(255,255,255)";
-		bgrgb="rgb(0,0,0)";
+	var bgrgb;
+	var graphic=false;
+	switch(this.vmode){
+		case VMODE_STDGRPH:
+		case VMODE_WIDEGRPH:
+			// Use both text and graphic
+			graphic=true;
+			bgrgb="rgb(0,0,0,0.0)";
+			context.clearRect(0,0,wide*8,wide*8);
+			break;
+		case VMODE_MONOTEXT:
+			// Black/white 80 width text
+			rgb="rgb(255,255,255)";
+			bgrgb="rgb(0,0,0)";
+			break;
+		default:
+			// Use only text
+			bgrgb="rgb("+this.bgcolor[0]+","+this.bgcolor[1]+","+this.bgcolor[2]+")";
+			break;
 	}
 	for(y=0;y<8;y++){
 		fd=system.read8(pFontData+ascii*8+y);
@@ -66,7 +85,12 @@ display.updateFont=function(ascii,pFontData,font,palette,width){
 		}
 	}
 	if (!font[palette]) font[palette]=Array(256);
-	font[palette][ascii]=context.getImageData(0,0,width*wide,8*wide);
+	if (graphic) {
+		font[palette][ascii]=new Image();
+		font[palette][ascii].src=this.fontcanvas.toDataURL();
+	} else {
+		font[palette][ascii]=context.getImageData(0,0,width*wide,8*wide);
+	}
 };
 display.cls=function(){
 	var wide=this.wide ? 2:1;
@@ -115,15 +139,60 @@ display.zoeagrph=function(){
 	}
 };
 display.stdgrph=function(){
-	alert('graphic '+this.vmode);
+	var x,y,address,data,palette;
+	var wide=this.wide ? 2:1;
+	address=this.gvram;
+	for(y=0;y<216;y++){
+		for(x=0;x<288;x++){
+			data=system.RAM[address++];
+			palette=this.palette[(data>>0)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+			x++;
+			palette=this.palette[(data>>8)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+			x++;
+			palette=this.palette[(data>>16)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+			x++;
+			palette=this.palette[(data>>24)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+		}
+	}
 };
 display.widegrph=function(){
-	alert('graphic '+this.vmode);
+	var x,y,address,data,palette;
+		var wide=this.wide ? 2:1;
+	address=this.gvram;
+	for(y=0;y<216;y++){
+		for(x=0;x<384;x++){
+			data=system.RAM[address++];
+			palette=this.palette[(data>>0)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+			x++;
+			palette=this.palette[(data>>8)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+			x++;
+			palette=this.palette[(data>>16)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+			x++;
+			palette=this.palette[(data>>24)&255];
+			this.context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+			this.context.fillRect(x*wide,y*wide,wide,wide);
+		}
+	}
 };
 display.all=function(){
 	var data,palette,pdata,posy,posx,addr,ascii;
 	var wide=this.wide ? 1:0;
 	var Fontp=system.read32(system.pFontp);
+	var graphic=false;
 	if (!Fontp) return;
 	if (Fontp!=this.Fontp){
 		// Font changed. Discard cached font images.
@@ -134,19 +203,19 @@ display.all=function(){
 	switch(this.vmode){
 		case VMODE_ZOEAGRPH:
 			this.zoeagrph();
-			break;
+			return; // Only graphic for Zoea compatible mode
 		case VMODE_STDGRPH:
 			this.stdgrph();
+			graphic=true;
 			break;
 		case VMODE_WIDEGRPH:
 			this.widegrph();
+			graphic=true;
 			break;
 		default: // Not graphic mode
 			break;
 	}
 	switch(this.width){
-		case 0: // Disabled (Zoea compatible graphic mode)
-			break;
 		case 40: case 64: case 80: // 6 dots width
 			for (posy=0;posy<27;posy++) {
 				for (posx=0;posx<this.width;posx++) {
@@ -158,7 +227,8 @@ display.all=function(){
 					} else if (!this.font2[palette][ascii]) {
 						this.updateFont(ascii,Fontp,this.font2,palette,6);
 					}
-					this.context.putImageData(this.font2[palette][ascii],posx*6<<wide,posy<<(3+wide));
+					if (graphic) this.context.drawImage(this.font2[palette][ascii],posx*6<<wide,posy<<(3+wide));
+					else this.context.putImageData(this.font2[palette][ascii],posx*6<<wide,posy<<(3+wide));
 				}
 			}
 			break;
@@ -175,7 +245,8 @@ display.all=function(){
 						//this.updateFont(ascii,this.pFontData,this.font,palette);
 						this.updateFont(ascii,Fontp,this.font,palette,8);
 					}
-					this.context.putImageData(this.font[palette][ascii],posx<<(3+wide),posy<<(3+wide));
+					if (graphic) this.context.drawImage(this.font[palette][ascii],posx<<(3+wide),posy<<(3+wide));
+					else this.context.putImageData(this.font[palette][ascii],posx<<(3+wide),posy<<(3+wide));
 				}
 			}
 			break;
