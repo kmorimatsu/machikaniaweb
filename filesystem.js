@@ -85,8 +85,9 @@ filesystem.root["LIB"]=new Array();
 filesystem.root["LIB"]["TEST"]="#TEST\n";
 filesystem.root["MACHIKAM.INI"]="#\n#\n";
 filesystem.root["TEST.BAS"]=(function(){/*cls
-a#=3.14
-print hex$(a)
+usegraphic 1
+circlefill 100,100,50,6
+a$=input$()
 */}).toString().match(/\/\*([\s\S]*)\*\//)[1];
 filesystem.root["TEST2.BAS"]=(function(){/*cls
 a=0x4048f5c3
