@@ -98,6 +98,11 @@ print "Hello World!"
 circlefill 300,100,50,1
 a$=input$()
 */}).toString().match(/\/\*([\s\S]*)\*\//)[1];
+filesystem.root["TEST3.BAS"]=(function(){/*cls
+for i=1 to 1000
+print i;
+next
+*/}).toString().match(/\/\*([\s\S]*)\*\//)[1];
 filesystem.curdir=filesystem.root;
 filesystem.curdirpath='\\';
 filesystem.getDir=function(stream){
