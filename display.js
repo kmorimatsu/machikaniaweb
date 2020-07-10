@@ -30,7 +30,6 @@ display.width=36;
 display.wide=0;
 display.vmode=0;
 display.gcache=new Array();
-display.tcache=new Array();
 display.pFontData=0;
 display.pFontData2=0;
 display.context=null;
@@ -337,7 +336,6 @@ display.set_videomode=function(mode,gvram){
 	this.font2=Array(256);
 	// Clear cache
 	this.gcache=new Array();
-	this.tcache=new Array();
 };
 display.set_palette=function(n,b,r,g){
 	// Update palette array
@@ -345,6 +343,8 @@ display.set_palette=function(n,b,r,g){
 	// Clear font image
 	this.font[n]=Array(256);
 	this.font2[n]=Array(256);
+	// Clear cache
+	this.gcache=new Array();
 };
 display.set_bgcolor=function(b,r,g){
 	// Update bgcolor
