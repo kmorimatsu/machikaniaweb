@@ -10,6 +10,7 @@
 
 #define CPU_CLOCK_HZ 95454533
 #define PERSISTENT_RAM_SIZE (1024*100)
+#define MIPS_ENABLE_FP
 
 int readbuttons();
 void scroll(int x, int y);

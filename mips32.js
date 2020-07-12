@@ -290,7 +290,7 @@ mips32.commands=[
 	"XORI",        //001110
 	"LUI",         //001111
 	"execCop0",    //010000
-	"void",        //010001
+	"execCop1",    //010001
 	"void",        //010010
 	"void",        //010011
 	"BEQL",        //010100
@@ -654,6 +654,106 @@ mips32.commandsCp0Rs=[
 	"WRPGPR",    //01110
 	"void",      //01111
 ];
+mips32.commandsCp1=[
+	"void",      //00000
+	"void",      //00001
+	"void",      //00010
+	"void",      //00011
+	"void",      //00100
+	"void",      //00101
+	"void",      //00110
+	"void",      //00111
+	"BC1",       //01000
+	"void",      //01001
+	"void",      //01010
+	"void",      //01011
+	"void",      //01100
+	"void",      //01101
+	"void",      //01110
+	"void",      //01111
+	"FPsingle",  //10000
+	"void",      //10001
+	"void",      //10010
+	"void",      //10011
+	"void",      //10100
+	"void",      //10101
+	"void",      //10110
+	"void",      //10111
+	"void",      //11000
+	"void",      //11001
+	"void",      //11010
+	"void",      //11011
+	"void",      //11100
+	"void",      //11101
+	"void",      //11110
+	"void",      //11111
+];
+mips32.commandsFPsingle=[
+	"ADD_S",     //000000
+	"SUB_S",     //000001
+	"MUL_S",     //000010
+	"DIV_S",     //000011
+	"SQRT_S",    //000100
+	"ABS_S",     //000101
+	"void",      //000110
+	"NEG_S",     //000111
+	"void",      //001000
+	"void",      //001001
+	"void",      //001010
+	"void",      //001011
+	"void",      //001100
+	"void",      //001101
+	"void",      //001110
+	"void",      //001111
+	"void",      //010000
+	"void",      //010001
+	"void",      //010010
+	"void",      //010011
+	"void",      //010100
+	"void",      //010101
+	"void",      //010110
+	"void",      //010111
+	"void",      //011000
+	"void",      //011001
+	"void",      //011010
+	"void",      //011011
+	"void",      //011100
+	"void",      //011101
+	"void",      //011110
+	"void",      //011111
+	"void",      //100000
+	"void",      //100001
+	"void",      //100010
+	"void",      //100011
+	"void",      //100100
+	"void",      //100101
+	"void",      //100110
+	"void",      //100111
+	"void",      //101000
+	"void",      //101001
+	"void",      //101010
+	"void",      //101011
+	"void",      //101100
+	"void",      //101101
+	"void",      //101110
+	"void",      //101111
+	"void",      //110000
+	"void",      //110001
+	"C_EQ_S",    //110010
+	"void",      //110011
+	"void",      //110100
+	"void",      //110101
+	"void",      //110110
+	"void",      //110111
+	"void",      //111000
+	"void",      //111001
+	"void",      //111010
+	"void",      //111011
+	"C_LT_S",    //111100
+	"void",      //111101
+	"C_LE_S",    //111110
+	"void",      //111111
+];
 mips32.commandsBSHFL=[
 	"void",      //00000
 	"void",      //00001
@@ -709,6 +809,35 @@ mips32.execCop0=function(){
 		this.log("Invalid command:\n COP0 MF 0x"+this.rs.toString(16));
 	}
 };
+mips32.execCop1=function(){
+	return this[this.commandsCp1[this.rs]]();
+};
+mips32.to32fromFloat=function(floatval){
+	// float to 32 bit value
+    if (floatval==0) {
+        return 0;
+    } else if (floatval<0) {
+        var sign=0x80000000;
+        floatval=-floatval;
+    } else {
+        var sign=0;
+    }
+    var log2=parseInt(Math.log2(floatval)+256)-256;
+    var int32val=parseInt(0.5+floatval*Math.pow(2,23-log2))&0x7fffff;
+    return sign | (log2+127)<<23 | int32val;
+};
+mips32.from32toFloat=function(int32val){
+	// 32 bit value to float
+    var sign=int32val & 0x80000000 ? -1:1;
+    var exp=(int32val>>23) & 0xff;
+    if (exp==0) return 0;
+    if (exp==255) return NaN;
+    var frac=(int32val & 0x7fffff)|0x800000;
+    return sign * Math.pow(2,exp-127) * (frac/0x800000);
+};
+mips32.FPsingle=function(){
+	return this[this.commandsFPsingle[this.mnl]]();
+};
 mips32.execSpecial2=function(){
 	return this[this.commandsSp2[this.mnl]]();
 };
@@ -717,6 +846,13 @@ mips32.execSpecial3=function(){
 };
 mips32.execBSHFL=function(){
 	return this[this.commandsBSHFL[this.sa]]();
+};
+mips32.ABS_S=function(){
+	// Floating point calculation
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	var sa=Math.abs(rd);
+	this.GPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.ADD=function(){
 	var rs=this.GPR.signed(this.rs);
@@ -727,6 +863,13 @@ mips32.ADD=function(){
 	} else {
 		this.exception("IntegerOverflow");
 	}
+};
+mips32.ADD_S=function(){
+	// Floating point calculation
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	var sa=rd+rt;
+	this.GPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.ADDI=function(){
 	var rs=this.GPR.signed(this.rs);
@@ -761,6 +904,21 @@ mips32.ANDI=function(){
 	var val16=this.unsigned16;
 	var rt=rs&val16;
 	this.GPR.set(this.rt,rt);
+};
+mips32.BC1=function(){
+	var pc=this.pc+this.signed16*4;
+	var fp=this.FP ? 1:0;
+	if (3<this.rt) {
+		this.log("Invalid BC1 instruction: "+rt);
+		return;
+	}
+	if (!(this.rt & 1)) fp=1-fp; // Flag ft (1:BC1T/BC1TL, 2:BC1F/BC1FL)
+	if (fp) {
+		this.exec();
+		this.pc=pc;
+	} else if ((this.rt & 2)) { // Flag nd (1:BC1TL/BC1FL, 0:BC1T/BC1L)
+		this.pc+=4;
+	}
 };
 mips32.BEQ=function(){
 	var pc=this.pc+this.signed16*4;
@@ -908,6 +1066,24 @@ mips32.BNEL=function(){
 mips32.BREAK=function(){
 	this.exception("BREAK");
 };
+mips32.C_EQ_S=function(){
+	// Floating point compare
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	this.FP= rd==rt ? 1:0;
+};
+mips32.C_LE_S=function(){
+	// Floating point compare
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	this.FP= rd<=rt ? 1:0;
+};
+mips32.C_LT_S=function(){
+	// Floating point compare
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	this.FP= rd<rt ? 1:0;
+};
 mips32.CACHE=function(){this.log("CACHE");};
 mips32.CLO=function(){
 	var i;
@@ -948,6 +1124,13 @@ mips32.DIV=function(){
 	var lo=(rs-hi)/rt;
 	this.HI(hi);
 	this.LO(lo);
+};
+mips32.DIV_S=function(){
+	// Floating point calculation
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	var sa=rd/rt;
+	this.GPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.DIVU=function(){
 	var rs=this.GPR.unsigned(this.rs);
@@ -1104,6 +1287,13 @@ mips32.MUL=function(){
 	var rd=this.LO();
 	this.GPR.set(this.rd,rd);
 };
+mips32.MUL_S=function(){
+	// Floating point calculation
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	var sa=rd*rt;
+	this.GPR.set(this.sa,this.to32fromFloat(sa));
+};
 mips32.MULT=function(){
 	var rs=this.GPR.unsigned(this.rs);
 	var rt=this.GPR.unsigned(this.rt);
@@ -1152,6 +1342,13 @@ mips32.MULTU=function(){
 	var hi=rsh*rth+((mid>>16)&0xffff);
 	this.HI(hi);
 	this.LO(lo);
+};
+mips32.NEG_S=function(){
+	// Floating point calculation
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	var sa=-rd;
+	this.GPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.NOR=function(){
 	var rs=this.GPR.unsigned(this.rs);
@@ -1240,6 +1437,13 @@ mips32.SLTU=function(){
 	var rd=(rs<rt) ? 1:0;
 	this.GPR.set(this.rd,rd);
 };
+mips32.SQRT_S=function(){
+	// Floating point calculation
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	var sa=Math.sqrt(rd);
+	this.GPR.set(this.sa,this.to32fromFloat(sa));
+};
 mips32.SRA=function(){
 	var rt=this.GPR(this.rt);
 	var sa=this.sa;
@@ -1291,6 +1495,13 @@ mips32.SUB=function(){
 	} else {
 		this.exception("IntegerOverflow");
 	}
+};
+mips32.SUB_S=function(){
+	// Floating point calculation
+	var rd=this.from32toFloat(this.GPR(this.rd));
+	var rt=this.from32toFloat(this.GPR(this.rt));
+	var sa=rd-rt;
+	this.GPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.SUBU=function(){
 	var rs=this.GPR.unsigned(this.rs);

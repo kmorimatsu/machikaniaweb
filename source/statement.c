@@ -686,7 +686,8 @@ char* let_statement(){
 			g_srcpos++;
 			check_obj_space(3);
 			g_object[g_objpos++]=0x8FA20004;          // lw    v0,4(sp)
-			g_object[g_objpos++]=0x8C420000;          // lw    v0,0(v0)			g_object[g_objpos++]=0x27BD0004;          // addiu sp,sp,4
+			g_object[g_objpos++]=0x8C420000;          // lw    v0,0(v0)
+			g_object[g_objpos++]=0x27BD0004;          // addiu sp,sp,4
 			return let_object_field();
 		}
 		next_position();
