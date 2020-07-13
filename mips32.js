@@ -823,6 +823,8 @@ mips32.to32fromFloat=function(floatval){
         var sign=0;
     }
     var log2=parseInt(Math.log2(floatval)+256)-256;
+	if (log2<-127) return sign;
+	if (127<log2) return sign|0x7f800000;
     var int32val=parseInt(0.5+floatval*Math.pow(2,23-log2))&0x7fffff;
     return sign | (log2+127)<<23 | int32val;
 };
