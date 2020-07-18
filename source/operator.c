@@ -220,125 +220,147 @@ char* calculation(enum operator op){
 char* calculation_float(enum operator op){
 	// $v0 = $a0 <op> $v0;
 	// All the calculations will be here.
+
+	// First, move values to FPR
+	/*
+		MTC1 Move Word to Floating Point: MTC1 rt,fs
+		 COP1   MF    rt    fs       0
+		010001 00100 00010 00001 00000000000
+	*/
+	check_obj_space(2);
+	g_object[g_objpos++]=0x44820800; // MTC1 v0,f1
+	g_object[g_objpos++]=0x44840000; // MTC1 a0,f0
+
+	// Main calculation routines follow
 	switch(op){
 		case OP_EQ:
 			/*
-				C.EQ.S a0,v0
+				C.EQ.S f0,f1
 				 COP1   fmt   ft     fs   cc 0 A FC cond
-				010001 10000 00010 00100 000 0 0 11 0010
+				010001 10000 00001 00000 000 0 0 11 0010
 				BC1TL
 				  COP1    BC   cc nd tf     offset
 				 010001 01000 000 1  1 0000000000000001
 			*/
 			check_obj_space(4);
-			g_object[g_objpos++]=0x46022032; // C.EQ.S a0,v0
+			g_object[g_objpos++]=0x46010032; // C.EQ.S f0,f1
 			g_object[g_objpos++]=0x34020000; // ori v0,zero,0000
 			g_object[g_objpos++]=0x45030001; // BC1TL label
 			g_object[g_objpos++]=0x3C023f80; // lui   v0,3f80
 			                                 // label:
-			break;
+			return 0;
 		case OP_NEQ:
 			/*
-				C.EQ.S a0,v0
+				C.EQ.S f0,f1
 				 COP1   fmt   ft     fs   cc 0 A FC cond
-				010001 10000 00010 00100 000 0 0 11 0010
+				010001 10000 00000 00001 000 0 0 11 0010
 				BC1FL
 				  COP1    BC   cc nd tf     offset
 				 010001 01000 000 1  0 0000000000000001
 			*/
 			check_obj_space(4);
-			g_object[g_objpos++]=0x46022032; // C.EQ.S a0,v0
+			g_object[g_objpos++]=0x46010032; // C.EQ.S f0,f1
 			g_object[g_objpos++]=0x34020000; // ori v0,zero,0000
 			g_object[g_objpos++]=0x45020001; // BC1FL label
 			g_object[g_objpos++]=0x3C023f80; // lui   v0,3f80
 			                                 // label:
-			break;
+			return 0;
 		case OP_LT:
 			/*
 				C.LT.S
 				BC1TL
 			*/
 			check_obj_space(4);
-			g_object[g_objpos++]=0x4602203C; // C.LT.S a0,v0
+			g_object[g_objpos++]=0x4601003C; // C.LT.S f0,f1
 			g_object[g_objpos++]=0x34020000; // ori v0,zero,0000
 			g_object[g_objpos++]=0x45030001; // BC1TL label
 			g_object[g_objpos++]=0x3C023f80; // lui   v0,3f80
 			                                 // label:
-			break;
+			return 0;
 		case OP_LTE:
 			/*
 				C.LE.S
 				BC1TL
 			*/
 			check_obj_space(4);
-			g_object[g_objpos++]=0x4602203E; // C.LE.S a0,v0
+			g_object[g_objpos++]=0x4601003E; // C.LE.S f0,f1
 			g_object[g_objpos++]=0x34020000; // ori v0,zero,0000
 			g_object[g_objpos++]=0x45030001; // BC1TL label
 			g_object[g_objpos++]=0x3C023f80; // lui   v0,3f80
 			                                 // label:
-			break;
+			return 0;
 		case OP_MT:
 			/*
 				C.LE.S
 				BC1FL
 			*/
 			check_obj_space(4);
-			g_object[g_objpos++]=0x4602203E; // C.LE.S a0,v0
+			g_object[g_objpos++]=0x4601003E; // C.LE.S f0,f1
 			g_object[g_objpos++]=0x34020000; // ori v0,zero,0000
 			g_object[g_objpos++]=0x45020001; // BC1FL label
 			g_object[g_objpos++]=0x3C023f80; // lui   v0,3f80
 			                                 // label:
-			break;
+			return 0;
 		case OP_MTE:
 			/*
 				C.LT.S
 				BC1FL
 			*/
 			check_obj_space(4);
-			g_object[g_objpos++]=0x4602203C; // C.LT.S a0,v0
+			g_object[g_objpos++]=0x4601003C; // C.LT.S f0,f1
 			g_object[g_objpos++]=0x34020000; // ori v0,zero,0000
 			g_object[g_objpos++]=0x45020001; // BC1FL label
 			g_object[g_objpos++]=0x3C023f80; // lui   v0,3f80
 			                                 // label:
-			break;
+			return 0;
 		case OP_ADD:
 			/*
-				ADD.S fd,fs,ft, where fd=$v0(r2), fs=$v0(r2), ft=$a0(r4)
+				ADD.S fd,fs,ft, where fd=$f0, fs=$f0, ft=$f1
 				
 				 COP1   fmt   ft    fs    fd    ADD
-				010001 10000 00010 00100 00010 000000
+				010001 10000 00001 00000 00000 000000
 				
-				0x46022080
+				0x46010000
 			*/
 			check_obj_space(1);
-			g_object[g_objpos++]=0x46022080;    // add.s       v0,a0,v0
+			g_object[g_objpos++]=0x46010000;    // add.s       f0,f0,f1
 			break;
 		case OP_SUB:
 			check_obj_space(1);
-			g_object[g_objpos++]=0x46022081;    // sub.s       v0,a0,v0
+			g_object[g_objpos++]=0x46010001;    // sub.s       f0,f0,f1
 			break;
 		case OP_MUL:
 			check_obj_space(1);
-			g_object[g_objpos++]=0x46022082;    // mul.s       v0,a0,v0
+			g_object[g_objpos++]=0x46010002;    // mul.s       f0,f0,f1
 			break;
 		case OP_DIV:
 			check_obj_space(4);
 			g_object[g_objpos++]=0x14400003;    // bne         v0,zero,label
-			g_object[g_objpos++]=0x46022083;    // div.s       v0,a0,v0
+			g_object[g_objpos++]=0x46010003;    // div.s       f0,f0,f1
 			call_lib_code(LIB_DIV0); // 2 words
  			                                    // label:
 			break;
 		case OP_OR:
-			check_obj_space(1);
+			g_objpos--;
+			g_objpos--;
 			g_object[g_objpos++]=0x00821025; // or          v0,a0,v0
 			break;
 		case OP_AND:
-			check_obj_space(1);
+			g_objpos--;
+			g_objpos--;
 			g_object[g_objpos++]=0x00821024; // and         v0,a0,v0
 			break;
 		default:
 			return ERR_SYNTAX;
 	}
+	// In the last, move value from FPR
+	/*
+		MFC1 Move Word From Floating Point: MFC1 rt,fs
+		 COP1   MF    rt    fs       0
+		010001 00000 00010 00000 00000000000
+	*/
+	check_obj_space(1);
+	g_object[g_objpos++]=0x44020000; // MFC1 $v0,$f0
 	return 0;
 }
 

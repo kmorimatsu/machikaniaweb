@@ -74,6 +74,16 @@ mips32.GPR.unsigned=function(num){
 	if (num<0) num+=4294967296;
 	return num;
 };
+mips32.FPR=function(num){
+	return arguments.callee.values[num];
+};
+mips32.FPR.values=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+mips32.FPR.set=function(num,value){
+	// Only single precision floating point is supported
+	value&=0xFFFFFFFF
+	if (value<0) value+=0x100000000;
+	this.values[num]=value&0xFFFFFFFF;
+};
 mips32.HI=function(){
 	if (0==arguments.length) {
 		return this.GPR(32);
@@ -655,11 +665,11 @@ mips32.commandsCp0Rs=[
 	"void",      //01111
 ];
 mips32.commandsCp1=[
-	"void",      //00000
+	"MFC1",      //00000
 	"void",      //00001
 	"void",      //00010
 	"void",      //00011
-	"void",      //00100
+	"MTC1",      //00100
 	"void",      //00101
 	"void",      //00110
 	"void",      //00111
@@ -851,10 +861,10 @@ mips32.execBSHFL=function(){
 };
 mips32.ABS_S=function(){
 	// Floating point calculation
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	var sa=Math.abs(rd);
-	this.GPR.set(this.sa,this.to32fromFloat(sa));
+	this.FPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.ADD=function(){
 	var rs=this.GPR.signed(this.rs);
@@ -868,10 +878,10 @@ mips32.ADD=function(){
 };
 mips32.ADD_S=function(){
 	// Floating point calculation
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	var sa=rd+rt;
-	this.GPR.set(this.sa,this.to32fromFloat(sa));
+	this.FPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.ADDI=function(){
 	var rs=this.GPR.signed(this.rs);
@@ -1070,20 +1080,20 @@ mips32.BREAK=function(){
 };
 mips32.C_EQ_S=function(){
 	// Floating point compare
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	this.FP= rd==rt ? 1:0;
 };
 mips32.C_LE_S=function(){
 	// Floating point compare
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	this.FP= rd<=rt ? 1:0;
 };
 mips32.C_LT_S=function(){
 	// Floating point compare
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	this.FP= rd<rt ? 1:0;
 };
 mips32.CACHE=function(){this.log("CACHE");};
@@ -1129,10 +1139,10 @@ mips32.DIV=function(){
 };
 mips32.DIV_S=function(){
 	// Floating point calculation
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	var sa=rd/rt;
-	this.GPR.set(this.sa,this.to32fromFloat(sa));
+	this.FPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.DIVU=function(){
 	var rs=this.GPR.unsigned(this.rs);
@@ -1251,6 +1261,9 @@ mips32.MADDU=function(){this.log("MADDU");};
 mips32.MFC0=function(){
 	this.GPR.set(this.rt,mips32.cp0.MFC0(this.rd,this.mnl));
 };
+mips32.MFC1=function(){
+	this.GPR.set(this.rt,this.FPR(this.rd));
+};
 mips32.MFHI=function(){
 	var rd=this.HI();
 	this.GPR.set(this.rd,rd);
@@ -1276,6 +1289,9 @@ mips32.MSUBU=function(){this.log("MSUBU");};
 mips32.MTC0=function(){
 	mips32.cp0.MTC0(this.rd,this.mnl,this.GPR(this.rt));
 };
+mips32.MTC1=function(){
+	this.FPR.set(this.rd,this.GPR(this.rt));
+};
 mips32.MTHI=function(){
 	var rs=this.GPR(this.rs);
 	this.HI(rs);
@@ -1291,10 +1307,10 @@ mips32.MUL=function(){
 };
 mips32.MUL_S=function(){
 	// Floating point calculation
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	var sa=rd*rt;
-	this.GPR.set(this.sa,this.to32fromFloat(sa));
+	this.FPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.MULT=function(){
 	var rs=this.GPR.unsigned(this.rs);
@@ -1347,10 +1363,10 @@ mips32.MULTU=function(){
 };
 mips32.NEG_S=function(){
 	// Floating point calculation
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	var sa=-rd;
-	this.GPR.set(this.sa,this.to32fromFloat(sa));
+	this.FPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.NOR=function(){
 	var rs=this.GPR.unsigned(this.rs);
@@ -1441,10 +1457,10 @@ mips32.SLTU=function(){
 };
 mips32.SQRT_S=function(){
 	// Floating point calculation
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	var sa=Math.sqrt(rd);
-	this.GPR.set(this.sa,this.to32fromFloat(sa));
+	this.FPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.SRA=function(){
 	var rt=this.GPR(this.rt);
@@ -1500,10 +1516,10 @@ mips32.SUB=function(){
 };
 mips32.SUB_S=function(){
 	// Floating point calculation
-	var rd=this.from32toFloat(this.GPR(this.rd));
-	var rt=this.from32toFloat(this.GPR(this.rt));
+	var rd=this.from32toFloat(this.FPR(this.rd));
+	var rt=this.from32toFloat(this.FPR(this.rt));
 	var sa=rd-rt;
-	this.GPR.set(this.sa,this.to32fromFloat(sa));
+	this.FPR.set(this.sa,this.to32fromFloat(sa));
 };
 mips32.SUBU=function(){
 	var rs=this.GPR.unsigned(this.rs);
