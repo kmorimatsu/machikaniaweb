@@ -231,6 +231,7 @@ mips32.setInterrupt=function(){
 			break;
 		}
 	}
+	if (!address) this.interrupts=new Array();
 };
 mips32.incTimer=function(clocks){
 	clocks=parseInt(clocks);
