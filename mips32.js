@@ -224,8 +224,8 @@ mips32.setInterrupt=function(){
 			delete this.interrupts[address];
 			// Set EPC
 			mips32.cp0.EPC=this.pc;
-			// Disable interrupt until EXL will be set
-			mips32.cp0.Status &=0x1FFFFFFD;
+			// Disable interrupt until EXL will be cleard
+			mips32.cp0.Status |=0x00000002;
 			// Set new PC
 			this.pc=address;
 			break;
@@ -246,9 +246,9 @@ mips32.incTimer=function(clocks){
 	}
 	mips32.cp0.Count=newCount;
 };
-mips32.exec=function(){
+mips32.exec=function(delayslot){
 	// Check interrupt first
-	if (this.interrupts.length && mips32.cp0.IE()) this.setInterrupt();
+	if (this.interrupts.length && mips32.cp0.IE() && !delayslot) this.setInterrupt();
 	// Increment core timer
 	mips32.cp0.Count++;
 	mips32.cp0.Count&=0xffffffff;
@@ -927,7 +927,7 @@ mips32.BC1=function(){
 	}
 	if (!(this.rt & 1)) fp=1-fp; // Flag ft (1:BC1T/BC1TL, 2:BC1F/BC1FL)
 	if (fp) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else if ((this.rt & 2)) { // Flag nd (1:BC1TL/BC1FL, 0:BC1T/BC1L)
 		this.pc+=4;
@@ -937,7 +937,7 @@ mips32.BEQ=function(){
 	var pc=this.pc+this.signed16*4;
 	var rs=this.GPR(this.rs);
 	var rt=this.GPR(this.rt);
-	this.exec();
+	this.exec(true);
 	if (rs==rt) {
 		this.pc=pc;
 	}
@@ -945,7 +945,7 @@ mips32.BEQ=function(){
 mips32.BEQL=function(){
 	var pc=this.pc+this.signed16*4;
 	if (this.GPR(this.rs)==this.GPR(this.rt)) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -954,7 +954,7 @@ mips32.BEQL=function(){
 mips32.BGEZ=function(){
 	var pc=this.pc+this.signed16*4;
 	var rs=this.GPR(this.rs);
-	this.exec();
+	this.exec(true);
 	if (!(rs&0x80000000)) {
 		this.pc=pc;
 	}
@@ -963,7 +963,7 @@ mips32.BGEZAL=function(){
 	var pc=this.pc+this.signed16*4;
 	var rs=this.GPR(this.rs);
 	this.GPR.set(31,this.pc+4);
-	this.exec();
+	this.exec(true);
 	if (!(this.rs&0x80000000)) {
 		this.pc=pc;
 	}
@@ -973,7 +973,7 @@ mips32.BGEZALL=function(){
 	var rs=this.GPR(this.rs);
 	this.GPR.set(31,this.pc+4);
 	if (!(rs&0x80000000)) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -982,7 +982,7 @@ mips32.BGEZALL=function(){
 mips32.BGEZL=function(){
 	var pc=this.pc+this.signed16*4;
 	if (!(this.GPR(this.rs)&0x80000000)) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -991,7 +991,7 @@ mips32.BGEZL=function(){
 mips32.BGTZ=function(){
 	var pc=this.pc+this.signed16*4;
 	var rs=this.GPR(this.rs);
-	this.exec();
+	this.exec(true);
 	if ((rs!=0)&&(!(rs&0x80000000))) {
 		this.pc=pc;
 	}
@@ -999,7 +999,7 @@ mips32.BGTZ=function(){
 mips32.BGTZL=function(){
 	var pc=this.pc+this.signed16*4;
 	if ((this.GPR(this.rs)!=0)&&(!(this.GPR(this.rs)&0x80000000))) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -1008,7 +1008,7 @@ mips32.BGTZL=function(){
 mips32.BLEZ=function(){
 	var pc=this.pc+this.signed16*4;
 	var rs=this.GPR(this.rs);
-	this.exec();
+	this.exec(true);
 	if ((rs==0)||(rs&0x80000000)) {
 		this.pc=pc;
 	}
@@ -1016,7 +1016,7 @@ mips32.BLEZ=function(){
 mips32.BLEZL=function(){
 	var pc=this.pc+this.signed16*4;
 	if ((this.GPR(this.rs)==0)||(this.GPR(this.rs)&0x80000000)) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -1025,7 +1025,7 @@ mips32.BLEZL=function(){
 mips32.BLTZ=function(){
 	var pc=this.pc+this.signed16*4;
 	var rs=this.GPR(this.rs);
-	this.exec();
+	this.exec(true);
 	if ((rs!=0)&&(rs&0x80000000)) {
 		this.pc=pc;
 	}
@@ -1034,7 +1034,7 @@ mips32.BLTZAL=function(){
 	var pc=this.pc+this.signed16*4;
 	this.GPR.set(31,this.pc+4);
 	var rs=this.GPR(this.rs);
-	this.exec();
+	this.exec(true);
 	if ((rs!=0)&&(rs&0x80000000)) {
 		this.pc=pc;
 	}
@@ -1043,7 +1043,7 @@ mips32.BLTZALL=function(){
 	var pc=this.pc+this.signed16*4;
 	this.GPR.set(31,this.pc+4);
 	if ((this.GPR(this.rs)!=0)&&(this.GPR(this.rs)&0x80000000)) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -1052,7 +1052,7 @@ mips32.BLTZALL=function(){
 mips32.BLTZL=function(){
 	var pc=this.pc+this.signed16*4;
 	if ((this.GPR(this.rs)!=0)&&(this.GPR(this.rs)&0x80000000)) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -1062,7 +1062,7 @@ mips32.BNE=function(){
 	var pc=this.pc+this.signed16*4;
 	var rs=this.GPR(this.rs);
 	var rt=this.GPR(this.rt);
-	this.exec();
+	this.exec(true);
 	if (rs!=rt) {
 		this.pc=pc;
 	}
@@ -1070,7 +1070,7 @@ mips32.BNE=function(){
 mips32.BNEL=function(){
 	var pc=this.pc+this.signed16*4;
 	if (this.GPR(this.rs)!=this.GPR(this.rt)) {
-		this.exec();
+		this.exec(true);
 		this.pc=pc;
 	} else {
 		this.pc+=4;
@@ -1158,6 +1158,13 @@ mips32.EI=function(){
 	mips32.cp0.EI();
 };
 mips32.ERET=function(){
+	if (mips32.cp0.Status&0x04) {
+		// If ERL, clear it
+		mips32.cp0.Status&=0x1FFFFFFB;
+	} else {
+		// Clear EXL flag
+		mips32.cp0.Status&=0x1FFFFFFD;
+	}
 	this.pc=mips32.cp0.EPC;
 };
 mips32.EXT=function(){
@@ -1181,27 +1188,27 @@ mips32.INS=function(){
 };
 mips32.J=function(){
 	var index=this.index;
-	this.exec();
+	this.exec(true);
 	this.pc-=0x0FFFFFFF&this.pc;
 	this.pc+=index<<2;
 
 };
 mips32.JAL=function(){
 	var index=this.index;
-	this.exec();
+	this.exec(true);
 	this.GPR.set(31,this.pc);
 	this.pc-=0x0FFFFFFF&this.pc;
 	this.pc+=index<<2;
 };
 mips32.JALR=function(){
 	var rs=this.GPR(this.rs);
-	this.exec();
+	this.exec(true);
 	this.GPR.set(31,this.pc);
 	this.pc=rs;
 };
 mips32.JR=function(){
 	var rs=this.GPR(this.rs);
-	this.exec();
+	this.exec(true);
 	this.pc=rs;
 };
 mips32.LB=function(){

@@ -60,6 +60,8 @@ main=function(maxspeed,breakpoint){
 			// Interrupts: always for T2 (vector 9) and CS0 (vector 1)
 			SFR.IFS0SET((1<<9)+(1<<1));
 			interrupt.check();
+			// Check sound
+			audio.play();
 			// Check halt state
 			if (mips32.checkHalt()||system.exceptionFlag||mips32.pc==breakpoint) {
 				mips32.cp0.DI();

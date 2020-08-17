@@ -170,8 +170,7 @@ mips32.cp0.IE=function(){
 	//   ERL(bit 2) = 0
 	var res=((this.Status & 7)==1) ? 1:0;
 	// Delay rising IE flag
-	var previous=this.previous;
-	this.previous=res;
-	return res && previous
+	this.IE.previous.unshift(res);
+	return res && this.IE.previous.pop();
 };
-mips32.cp0.IE.previous=0;
+mips32.cp0.IE.previous=new Array(0,0,0,0);

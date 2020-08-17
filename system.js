@@ -45,6 +45,8 @@ system.pPs2keystatus=0;
 system.pVkey=0;
 system.pGFileArray0=0;
 system.pGFileArray1=0;
+system.pWaveTable=0;
+system.pMusicActive=0;
 system.reset=function(hexname){
 	var i,res;
 	mips32.reset(USER_APP_RESET_ADDRESS);
@@ -321,9 +323,12 @@ system.write16=function(address,data){
 	}
 	this.write32(address&0xFFFFFFFC,data);
 };
-system.readRAM8=function(address){
+system.readRAM32=function(address){
 	address=parseInt(address)&0xffffff;
-	var data=this.unsigned32(this.RAM[address>>2]);
+	return this.unsigned32(this.RAM[address>>2]);
+};
+system.readRAM8=function(address){
+	var data=this.readRAM32(address);
 	switch(address&3){
 		// Little endian
 		case 0:
@@ -370,6 +375,8 @@ system.init=function(){
 	this.pVkey         = this.read32(0x9d006018); // volatile unsigned short vkey;
 	this.pGFileArray0  = this.read32(0x9d00601C); // FSFILE gFileArray[]
 	this.pGFileArray1  = this.read32(0x9d006020); // FSFILE gFileArray[]
+	this.pWaveTable    = this.read32(0x9d006024); // &g_var_mem[ALLOC_WAVE_BLOCK]
+	this.pMusicActive  = this.read32(0x9d006028); // &g_music_active
 	// Initialize timers
 	this.initTimer(timer1,1,'IFS0<4>');
 	this.initTimer(timer2,2,'IFS0<9>');
@@ -381,6 +388,7 @@ system.init=function(){
 	};
 	/* Initialize interrupt
 	       vector  IF       IE      Priority    Subprioriy
+	    CT   0   IFS0<0>  IEC0<0>  IPC0<4:2>   IPC0<1:0>
 		CS0  1   IFS0<1>  IEC0<1>  IPC0<12:10> IPC0<9:8>
 		CS1  2   IFS0<2>  IEC0<2>  IPC0<20:18> IPC0<17:16>
 		T1   4   IFS0<4>  IEC0<4>  IPC1<4:2>   IPC1<1:0>

@@ -234,7 +234,10 @@ asm volatile("label1_2:");
 // End skip for MachiKania web */
 
 	mT2ClearIntFlag();			// T2割り込みフラグクリア
-	if(LineCount==1) IFS0bits.CS0IF=1;//ソフトウェア割り込み1発生
+/* Begin skip for MachiKania web
+	if(LineCount==1) 
+// End skip for MachiKania web */
+	IFS0bits.CS0IF=1;//ソフトウェア割り込み1発生
 }
 
 /*********************

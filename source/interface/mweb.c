@@ -1,6 +1,7 @@
 #include <xc.h>
 #include "../api.h"
 #include "./mweb.h"
+#include "../compiler.h"
 
 /*
 	TODO:
@@ -43,6 +44,8 @@ const unsigned int _html5_data[] __attribute__((address(0x9D006000))) ={
 	(unsigned int)(&vkey),
 	(unsigned int)(&gFileArray[0]),
 	(unsigned int)(&gFileArray[1]),
+	(unsigned int)(&g_var_mem[ALLOC_WAVE_BLOCK]),
+	(unsigned int)(&g_music_active),
 };
 
 const unsigned int _html5_func[] __attribute__((address(0x9D006080))) ={

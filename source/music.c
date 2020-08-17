@@ -353,8 +353,8 @@ void musicint(){
 				OC4RS--;
 			}
 			if (OC3RS==0x80 && OC4RS==0x80) {
-				// Stop interrupt
-				IEC0bits.CS0IE=0;
+				// Inactive music
+				g_music_active=0;
 			}
 			break;
 		default:
