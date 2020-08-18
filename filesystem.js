@@ -74,6 +74,7 @@ searchrec.filename.set=function(address,str){
 };
 
 filesystem=new Object();
+filesystem.mode="Uint8Array"; // Either Uint8Array or string
 filesystem.fhandle0=0;
 filesystem.fhandle1=0;
 filesystem.fhandle0dir=0;
@@ -130,6 +131,31 @@ filesystem.checkFileName=function(filename){
 	} else {
 		return ret.substr(0,i+4);
 	}
+};
+filesystem.checkObj=function(obj){
+	switch(typeof obj){
+		case "string": // String
+			if (this.mode=="string") break;
+			// Convert to Uint8array
+			var str=obj;
+			obj=new Uint8Array(obj.length);
+			for(var i=0;i<obj.length;i++){
+				obj[i]=str.charCodeAt(i);
+			}
+			break;
+		case "object": // Uint8Array
+			if (this.mode=="Uint8Array") break;
+			// Convert to string
+			var str="";
+			for(var i=0;i<obj.length;i++){
+				str+=String.fromCharCode(obj[i]);
+			}
+			obj=str;
+			break;
+		default:
+			break;
+	}
+	return obj;
 };
 filesystem.FSInit=function(){// TODO: around here (initiation).
 	//int FSInit(void);
@@ -229,6 +255,7 @@ filesystem.FSfread=function(ptr,size,n,stream){
 	var file=this.getFile(stream);
 	if (!dir) return 0;
 	if (fsfile.flags(stream) & 0x02) {
+		dir[file]=this.checkObj(dir[file]);
 		// Prepare PIC32 conditions
 		n=size*n;
 		size=fsfile.size(stream);
@@ -237,7 +264,9 @@ filesystem.FSfread=function(ptr,size,n,stream){
 		fsfile.seek.set(stream,seek+n);
 		// Update RAM in PIC32
 		for(var i=0;i<n;i++){
-			system.write8(ptr+i,dir[file].charCodeAt(seek+i));
+			if (this.mode=="string") system.write8(ptr+i,dir[file].charCodeAt(seek+i));
+			else if (this.mode=="Uint8Array") system.write8(ptr+i,dir[file][seek+i]);
+			else alert("Invalid filesystem mode");
 		}
 		return n;
 	} else {
@@ -252,7 +281,7 @@ filesystem.FSfwrite=function(data_to_write,size,n,stream){
 	var file=this.getFile(stream);
 	if (!dir) return 0;
 	if (Array.isArray(dir[file])) return 0;
-	var str=dir[file];
+	var str=dir[file]=this.checkObj(dir[file]);
 	if (fsfile.flags(stream) & 0x01) {
 		// Prepare PIC32 conditions
 		n=size*n;
@@ -261,13 +290,25 @@ filesystem.FSfwrite=function(data_to_write,size,n,stream){
 		fsfile.seek.set(stream,seek+n);
 		if (size<seek+n) size=seek+n;
 		fsfile.size.set(stream,size);
-		// Update string in HTML5
-		var result=str.substring(0,seek);
-		for(var i=0;i<n;i++){
-			result+=String.fromCharCode(system.read8(data_to_write+i));
-		}
-		result+=str.substring(seek+n);
-		dir[file]=result;
+		// String version
+		if (this.mode=="string") {
+			// Update string in HTML5
+			var result=str.substring(0,seek);
+			for(var i=0;i<n;i++){
+				result+=String.fromCharCode(system.read8(data_to_write+i));
+			}
+			result+=str.substring(seek+n);
+			dir[file]=result;
+		} else if (this.mode=="Uint8Array") {
+			// Uint8Array version
+			var result=new Uint8Array(size);
+			var i;
+			for(i=0;i<dir[file].length;i++) result[i]=dir[file][i];
+			for(i=0;i<n;i++){
+				result[seek+i]=system.read8(data_to_write+i);
+			}
+			dir[file]=result;
+		} else alert("Invalid filesystem mode");
 		return n;
 	} else {
 		// Writing is not allowed
@@ -491,7 +532,8 @@ filesystem.loadZip=function(zip){
 			if (!Array.isArray(dir[m[1]])) dir[m[1]]=new Array();
 			if (m[2].length) explore(m[2],dir[m[1]],contents);
 		} else {
-			dir[filename]=contents.asText();
+			//dir[filename]=contents.asText();
+			dir[filename]=contents.asUint8Array();
 		}
 	};
 	// List up all files in ZIP archive and store in the disk image
