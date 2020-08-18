@@ -225,7 +225,7 @@ mips32.setInterrupt=function(){
 			// Set EPC
 			mips32.cp0.EPC=this.pc;
 			// Disable interrupt until EXL will be cleard
-			mips32.cp0.Status |=0x00000002;
+			mips32.cp0.setExl();
 			// Set new PC
 			this.pc=address;
 			break;
@@ -1160,10 +1160,10 @@ mips32.EI=function(){
 mips32.ERET=function(){
 	if (mips32.cp0.Status&0x04) {
 		// If ERL, clear it
-		mips32.cp0.Status&=0x1FFFFFFB;
+		mips32.cp0.clearErl();
 	} else {
 		// Clear EXL flag
-		mips32.cp0.Status&=0x1FFFFFFD;
+		mips32.cp0.clearExl();
 	}
 	this.pc=mips32.cp0.EPC;
 };

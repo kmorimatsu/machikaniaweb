@@ -169,8 +169,28 @@ mips32.cp0.IE=function(){
 	//   EXL(bit 1) = 0
 	//   ERL(bit 2) = 0
 	var res=((this.Status & 7)==1) ? 1:0;
-	// Delay rising IE flag
-	this.IE.previous.unshift(res);
-	return res && this.IE.previous.pop();
+	if (res) {
+		// Delay rising IE flag
+		this.IE.previous.push(res);
+		return res && this.IE.previous.shift();
+	} else {
+		this.IE.previous=new Array(0,0,0,0);
+		return 0;
+	}
 };
 mips32.cp0.IE.previous=new Array(0,0,0,0);
+mips32.cp0.setExl=function(){
+	this.Status|=2;
+};
+mips32.cp0.setErl=function(){
+	this.Status|=4;
+};
+mips32.cp0.clearExl=function(){
+	this.Status &=0x1FFFFFFD;
+};
+mips32.cp0.clearErl=function(){
+	this.Status &=0x1FFFFFFB;
+};
+mips32.cp0.clearExlErl=function(){
+	this.Status &=0x1FFFFFF9;
+};

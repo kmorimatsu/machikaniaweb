@@ -8,7 +8,7 @@ audio=new Object();
 audio.rate=48000;
 audio.block=-1; // Either 0, 1, or 0 (first half, last half, or invalid)
 audio.buffer1=new Array();
-audio.buffer1=new Array();
+audio.buffer2=new Array();
 audio.bpos=0;
 audio.play=function(){
 	var i;
