@@ -316,16 +316,27 @@ filesystem.FSfwrite=function(data_to_write,size,n,stream){
 	}
 };
 filesystem.FSftell=function(fo){
-//long FSftell(FSFILE *fo);
-alert('ftell');
+	//long FSftell(FSFILE *fo);
+	return fsfile.seek(fo);
 };
 filesystem.FSfseek=function(stream,offset,whence){
-//int FSfseek(FSFILE *stream, long offset, int whence);
-alert('fseek');
+	//int FSfseek(FSFILE *stream, long offset, int whence);
+	switch(whence){
+		case 1: // SEEK_CUR - Seek from current location
+			fsfile.seek.set(stream,fsfile.seek(stream)+offset);
+			break;
+		case 2: // SEEK_END - Seek from end of file (subtract offset)
+			fsfile.seek.set(stream,fsfile.size(stream)-offset);
+			break;
+		case 0: // SEEK_SET - Seek from start of file
+		default:
+			fsfile.seek.set(stream,offset);
+			break;
+	}
 };
 filesystem.FSrewind=function(fo){
-//void FSrewind (FSFILE *fo);
-alert('rewind');
+	//void FSrewind (FSFILE *fo);
+	this.FSfseek(fo,0,0);
 };
 filesystem.FindFirst=function(fileName,attr,rec){
 	//int FindFirst (const char * fileName, unsigned int attr, SearchRec * rec);
@@ -388,8 +399,11 @@ filesystem.FindNext=function(rec){
 	return 0;
 };
 filesystem.FSmkdir=function(path){
-//int FSmkdir (char * path);
-alert('mkdir');
+	//int FSmkdir (char * path);
+	path=this.toString(path);
+	if (this.curdir[path]) return -1;
+	this.curdir[path]=new Array();
+	return 0;
 };
 filesystem.FSgetcwd=function(path,numbchars){
 //char * FSgetcwd (char * path, int numbchars);
@@ -422,7 +436,7 @@ filesystem.FSchdir=function(path){
 			}
 			break;
 		default:
-			path=this.curdirpath+'\\'+path;
+			if (path.substr(0,1)!='\\')	path=this.curdirpath+'\\'+path;
 			break;
 	}
 	if (path.substr(0,2)=='\\\\') path=path.substr(1);
