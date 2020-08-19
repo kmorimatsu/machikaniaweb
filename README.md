@@ -23,6 +23,7 @@ type M とほぼ同様の事が出来ますが、はっきりと把握してい�
 
 MachiKania webは、以下の URL にアクセスすることで使用できます。
 
+<<<<<<< HEAD
 　machikania.html　US キーボード( 101 キーボード)で、通常画面で使用
 
 　machikaniawide.html　US キーボード( 101 キーボード)で、大画面で使用
@@ -30,6 +31,15 @@ MachiKania webは、以下の URL にアクセスすることで使用できま�
 　machikania.html?jp=1　JP キーボード( 106 キーボード)で、通常画面で使用
 
 　machikaniawide.html?jp=1　US キーボード( 101 キーボード)で、大画面で使用
+=======
+machikania.html　US キーボード( 101 キーボード)で、通常画面で使用
+
+machikaniawide.html　US キーボード( 101 キーボード)で、大画面で使用
+
+machikania.html?jp=1　JP キーボード( 106 キーボード)で、通常画面で使用
+
+machikaniawide.html?jp=1　US キーボード( 101 キーボード)で、大画面で使用
+>>>>>>> e2e44908c3abd65654c1f4e2ee721d7271faa5d4
 
 基本的な使い方は、type M と全く同じです。BASIC プログラムを入力した後、「 F4 」キーを押せば、実行することができます。「 F1 」キーや「 F2 」キーで、プログラムをロードしたりセーブしたりすることができます。
 
@@ -39,4 +49,8 @@ MMC カードの代替になる ZIP アーカイブのやり取りは、「 Load
 
 「 Break 」ボタンは、プログラムの実行を停止する場合に押してください。
 
+<<<<<<< HEAD
 「 Links 」を押せば、MachiKania のユーザーマニュアルの閲覧などの、さまざまなリンクが表示されます。
+=======
+「 Links 」を押せば、MachiKania のユーザーマニュアルの閲覧などの、さまざまなリンクが表示されます。
+>>>>>>> e2e44908c3abd65654c1f4e2ee721d7271faa5d4
