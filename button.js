@@ -62,5 +62,31 @@ button.right=function(down){
 	if (down) SFR.PORTDCLR(0x08);
 	else SFR.PORTDSET(0x08);
 };
+button.key4button=function(obj){
+	this.key4button.checked=obj.checked;
+};
+button.keyboard=function(code,down){
+	if (!this.key4button.checked) return;
+	switch(code){
+		case 83:
+			this.start(down);
+			break;
+		case 70:
+			this.fire(down);
+			break;
+		case 37:
+			this.left(down);
+			break;
+		case 38:
+			this.up(down);
+			break;
+		case 40:
+			this.down(down);
+			break;
+		case 39:
+			this.right(down);
+			break;
+	}
+};
 
 button.init();

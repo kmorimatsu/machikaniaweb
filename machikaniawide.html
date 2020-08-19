@@ -28,7 +28,7 @@
 	<script type="text/javascript" src="./mips32cp0.js"></script>
 	<script type="text/javascript" src="./hexfile.js"></script>
 	<script type="text/javascript" src="./mmc.js"></script>
-	<title>MachiKania web v0.5.0</title>
+	<title>MachiKania web v0.5.1</title>
 </head>
 <body>
 	<div class="side" id="side">
@@ -57,6 +57,7 @@
 			<input id="Ubutton" value="↑" type="button" ontouchstart="button.up(1);" ontouchend="button.up(0);" onmousedown="button.up(1);" onmouseout="button.up(0);" onmouseup="button.up(0);"/>
 			<input id="Dbutton" value="↓" type="button" ontouchstart="button.down(1);" ontouchend="button.down(0);" onmousedown="button.down(1);" onmouseout="button.down(0);" onmouseup="button.down(0);"/>
 			<input id="Rbutton" value="→" type="button" ontouchstart="button.right(1);" ontouchend="button.right(0);" onmousedown="button.right(1);" onmouseout="button.right(0);" onmouseup="button.right(0);"/>
+			<input id="UseKey4button" type="checkbox" onclick="button.key4button(this);" />Use keys for buttons
 		</div>
 		<div id="debug" class="debug">
 			<!-- debug -->

@@ -61,6 +61,7 @@ keyboard.keydown=function(code,event){
 	if (status) {
 		system.write8(status+code,1);
 	}
+	button.keyboard(code,1);
 };
 keyboard.keyup=function(code,event){
 	this.checkShiftKeys(event);
@@ -68,6 +69,7 @@ keyboard.keyup=function(code,event){
 	if (status) {
 		system.write8(status+code,0);
 	}
+	button.keyboard(code,0);
 };
 keyboard.convertCode=function(code){
 	var shiftkey=this.shiftkey;
