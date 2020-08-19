@@ -556,4 +556,6 @@ filesystem.loadZip=function(zip){
 	}
 	// Replace disk image in file system
 	this.root=root;
+	this.curdir=this.root;
+	this.curdirpath='\\';
 };

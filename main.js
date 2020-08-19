@@ -7,6 +7,7 @@
 // Initialize system
 hexfile.load();
 system.init();
+mmc.setCard();
 display.init(system.pFontData,system.pFontData2);
 display.all();
 if (get.debug=='hex') {
