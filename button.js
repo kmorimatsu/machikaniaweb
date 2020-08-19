@@ -33,6 +33,11 @@ button.kanalock=function(obj){
 		keyboard.kanaclick(0);
 	}
 };
+button.break=function(obj){
+	system.write8(system.pPs2keystatus+3,1);
+	setTimeout(function(){ system.write8(system.pPs2keystatus+3,0); },100);
+	setTimeout(function(){ system.write8(system.pPs2keystatus+3,0); },200);
+};
 button.start=function(down){
 	if (down) SFR.PORTDCLR(0x10);
 	else SFR.PORTDSET(0x10);
