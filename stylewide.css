@@ -19,7 +19,7 @@ body {
 	float: right;
 	display: none;
 }
-.buttons{
+.links, .buttons{
 	background: #fff;
 	width: 960px;
 }
@@ -28,7 +28,7 @@ body {
 	width: 960px;
 	height: 100px;
 }
-.debug, .hidden {
+.debug, .links, .hidden {
 	display:none;
 }
 .help{
