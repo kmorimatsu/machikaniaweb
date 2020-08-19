@@ -29,7 +29,7 @@ MachiKania webは、以下の URL にアクセスすることで使用できま�
 
 　machikania.html?jp=1　JP キーボード( 106 キーボード)で、通常画面で使用
 
-　machikaniawide.html?jp=1　US キーボード( 101 キーボード)で、大画面で使用
+　machikaniawide.html?jp=1　JP キーボード( 106 キーボード)で、大画面で使用
 
 基本的な使い方は、type M と全く同じです。BASIC プログラムを入力した後、「 F4 」キーを押せば、実行することができます。「 F1 」キーや「 F2 」キーで、プログラムをロードしたりセーブしたりすることができます。
 
