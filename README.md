@@ -23,13 +23,13 @@ type M とほぼ同様の事が出来ますが、はっきりと把握してい�
 
 MachiKania webは、以下の URL にアクセスすることで使用できます。
 
-　machikania.html　US キーボード( 101 キーボード)で、通常画面で使用
+　[machikania.html](https://kmorimatsu.github.io/machikania/machikania.html)　US キーボード( 101 キーボード)で、通常画面で使用
 
-　machikaniawide.html　US キーボード( 101 キーボード)で、大画面で使用
+　[machikaniawide.html](https://kmorimatsu.github.io/machikania/machikaniawide.html)　US キーボード( 101 キーボード)で、大画面で使用
 
-　machikania.html?jp=1　JP キーボード( 106 キーボード)で、通常画面で使用
+　[machikania.html?jp=1](https://kmorimatsu.github.io/machikania/machikania.html?jp=1)　JP キーボード( 106 キーボード)で、通常画面で使用
 
-　machikaniawide.html?jp=1　JP キーボード( 106 キーボード)で、大画面で使用
+　[machikaniawide.html?jp=1](https://kmorimatsu.github.io/machikania/machikaniawide.html?jp=1)　JP キーボード( 106 キーボード)で、大画面で使用
 
 基本的な使い方は、type M と全く同じです。BASIC プログラムを入力した後、「 F4 」キーを押せば、実行することができます。「 F1 」キーや「 F2 」キーで、プログラムをロードしたりセーブしたりすることができます。
 
