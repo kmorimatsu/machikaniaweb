@@ -29,6 +29,7 @@ P_CONFIG_BASE_ADDRESS       =0x1FC02FF0;
 P_CONFIG_END_ADDRESS        =0x1FC02FFF;
 
 system=new Object();
+system.version='0.6.0';
 system.note='';
 // Memory areas
 system.RAM=new Array();
@@ -37,6 +38,7 @@ system.BOOT=new Array();
 system.CONFIG=new Array();
 // Pointers to PIC32 variables/functions
 system.pTVRAM=0;
+system.pVRAM=0;
 system.pFontData=0;
 system.pFontData2=0;
 system.pFontp=0;
@@ -369,6 +371,7 @@ system.init=function(){
 	this.pTVRAM        = this.read32(0x9d006000);
 	this.pFontData     = this.read32(0x9d006004);
 	this.pFontData2    = this.read32(0x9d006008);
+	this.pVRAM         = this.pFontData2;
 	this.pFontp        = this.read32(0x9d00600C);
 	this.pHtml5data    = this.read32(0x9d006010);
 	this.pPs2keystatus = this.read32(0x9d006014); // volatile unsigned char ps2keystatus[256];
@@ -407,16 +410,19 @@ system.init=function(){
 system.initTimer=function(timerobj,type,interrupt){
 	var con=SFR['T'+type+'CON'];
 	SFR['T'+type+'CON']=function(num){
+		if (num===undefined) return con(num);
 		con(num);
 		timerobj.init(num);
 	};
 	var pr=SFR['PR'+type];
 	SFR['PR'+type]=function(num){
+		if (num===undefined) return pr(num);
 		pr(num);
 		timerobj.PR=num&0xFFFF;
 	};
 	var tmr=SFR['TMR'+type];
 	SFR['TMR'+type]=function(num){
+		if (num===undefined) return tmr(num);
 		tmr(num);
 		timerobj.TMR=num&0xFFFF;
 	};

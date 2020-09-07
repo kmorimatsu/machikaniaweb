@@ -9,48 +9,33 @@
 -->
 <head>
 	<meta charset="UTF-8" />
-	<link rel="stylesheet" type="text/css" href="./stylewide.css" />
+	<link rel="stylesheet" type="text/css" href="./style.css" />
 	<!-- Load javascript fies -->
 	<script type="text/javascript" src="./get.js"></script>
 	<script type="text/javascript" src="./dom.js"></script>
-	<script type="text/javascript" src="./jszip.js"></script>
 	<script type="text/javascript" src="./display.js"></script>
-	<script type="text/javascript">display.wide=1;</script>
 	<script type="text/javascript" src="./keyboard.js"></script>
 	<script type="text/javascript" src="./system.js"></script>
-	<script type="text/javascript" src="./filesystem.js"></script>
 	<script type="text/javascript" src="./sfr.js"></script>
 	<script type="text/javascript" src="./button.js"></script>
-	<script type="text/javascript" src="./audio.js"></script>
+	<script type="text/javascript" src="./audiopweb.js"></script>
 	<script type="text/javascript" src="./timer.js"></script>
 	<script type="text/javascript" src="./interrupt.js"></script>
 	<script type="text/javascript" src="./mips32.js"></script>
 	<script type="text/javascript" src="./mips32cp0.js"></script>
-	<script type="text/javascript" src="./hexfile.js"></script>
-	<script type="text/javascript" src="./mmc.js"></script>
-	<title>MachiKania web v0.5.1</title>
+	<script type="text/javascript" src="./hexbweb.js"></script>
+	<title>title</title>
 </head>
 <body>
 	<!--div class="side" id="side">
 		<iframe src="help.txt" class="help"></iframe>
 	</div -->
 	<div class="main">
-		<!-- Main canvas used for display with 30x27 character resolution -->
-		<canvas id="display" width="960" height="448"></canvas>
+		<!-- Main canvas used for display with 36x28 character resolution -->
+		<canvas id="display" width="300" height="225"></canvas>
 		<!-- Debug buttons -->
 		<div class="buttons">
 			<span id="speed"><!--clock: 0 hz--></span><br />
-			<!-- File upload input -->
-			<input class="hidden" id="load" type="file" onchange="filesystem.loaded(this);" />
-			<!-- File upload button -->
-			<input type="button" value="Load Disk Image" onclick="filesystem.setFile(document.getElementById('load'));" />
-			<!-- File download link -->
-			<input type="button" value="Save Disk Image" id="savebutton" onclick="
-				filesystem.saveLink(document.getElementById('save'));
-			" />
-			<a class="hidden" id="save" href="#" download="mwebdisk.zip">Save Disk Image</a><br />
-			<input id="KanaLock" value="KanaLock" type="button" onclick="button.kanalock(this);" />
-			<input id="KanaLock" value="Break" type="button" onclick="button.break(this);" />
 			<a href="#" onclick="document.getElementById('links').style.display='block'; return false;">Links</a><br />
 			<input id="Sbutton" value="S" type="button" ontouchstart="button.start(1);" ontouchend="button.start(0);" onmousedown="button.start(1);" onmouseout="button.start(0);" onmouseup="button.start(0);"/>
 			<input id="Fbutton" value="F" type="button" ontouchstart="button.fire(1);" ontouchend="button.fire(0);" onmousedown="button.fire(1);" onmouseout="button.fire(0);" onmouseup="button.fire(0);"/>
@@ -58,7 +43,6 @@
 			<input id="Ubutton" value="↑" type="button" ontouchstart="button.up(1);" ontouchend="button.up(0);" onmousedown="button.up(1);" onmouseout="button.up(0);" onmouseup="button.up(0);"/>
 			<input id="Dbutton" value="↓" type="button" ontouchstart="button.down(1);" ontouchend="button.down(0);" onmousedown="button.down(1);" onmouseout="button.down(0);" onmouseup="button.down(0);"/>
 			<input id="Rbutton" value="→" type="button" ontouchstart="button.right(1);" ontouchend="button.right(0);" onmousedown="button.right(1);" onmouseout="button.right(0);" onmouseup="button.right(0);"/>
-			<input id="UseKey4button" type="checkbox" onclick="button.key4button(this);" />Use keys for buttons
 		</div>
 		<div id="links" class="links">
 			<a href="machikaniawide.html" >US-key-wide</a>
@@ -83,7 +67,7 @@
 		</div>
 	</div>
 	<!-- Load main script -->
-	<script type="text/javascript" src="./init.js"></script>
+	<script type="text/javascript" src="./initpweb.js"></script>
 	<script type="text/javascript" src="./main.js"></script>
 	<!-- -->
 </body>

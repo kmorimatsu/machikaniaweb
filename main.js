@@ -4,20 +4,6 @@
 *        under the LGPL v2.1.       *
 ************************************/
 
-// Initialize system
-hexfile.load();
-system.init();
-mmc.setCard();
-display.init(system.pFontData,system.pFontData2);
-display.all();
-if (get.debug=='hex') {
-	system.reset('DUMMY.HEX');
-} else {
-	system.reset('MACHIKAM.HEX');
-}
-// Show display every 40 msec (25 frames/sec)
-display.show(40);
-
 main=function(maxspeed,breakpoint){
 	system.exceptionFlag=0;
 	main.active=1;

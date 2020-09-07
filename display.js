@@ -19,6 +19,7 @@ const VMODE_MONOTEXT=5; // モノクロテキスト80文字モード
 const VMODE_ZOEAGRPH=16; // type Z互換グラフィックモード
 const VMODE_STDGRPH=17; // 標準グラフィック＋テキスト36文字モード
 const VMODE_WIDEGRPH=18; // ワイドグラフィック＋テキスト48文字モード
+const VMODE_PWEBGRPH=32; // グラフィック300ドット＋テキスト36文字モード
 
 display=new Object();
 display.fonts=new Image();
@@ -27,6 +28,7 @@ display.font2=new Array(256);
 display.palette=new Array(256);
 display.bgcolor=[0,0,0];
 display.width=36;
+display.height=27;
 display.wide=0;
 display.vmode=0;
 display.gcache=new Array();
@@ -42,7 +44,7 @@ display.init=function(FontData,FontData2){
 	this.context=dom.getContext("display");
 	this.gcanvas=document.createElement('canvas');
 	this.gcanvas.width=384*wide;
-	this.gcanvas.height=216*wide;
+	this.gcanvas.height=225*wide;
 	this.gcontext=this.gcanvas.getContext('2d');
 	this.cls();
 	// Canvas imageData is created when needed in display.all()
@@ -67,6 +69,7 @@ display.updateFont=function(ascii,pFontData,font,palette,width){
 	var context=canvas.getContext('2d');
 	switch(this.vmode){
 		case VMODE_STDGRPH:
+		case VMODE_PWEBGRPH:
 		case VMODE_WIDEGRPH:
 			// Use both text and graphic
 			rgb="rgb("+this.palette[palette][0]+","+this.palette[palette][1]+","+this.palette[palette][2]+")";
@@ -211,6 +214,38 @@ display.widegrph=function(){
 		}
 	}
 };
+display.pwebgrph=function(){
+	var x,y,address,data,palette;
+	var wide=this.wide ? 2:1;
+	var context=this.gcontext;
+	address=this.gvram;
+	for(y=0;y<225;y++){
+		for(x=0;x<300;x++){
+			data=system.RAM[address];
+			if (this.gcache[address]===data) {
+				address++;
+				x+=3;
+			} else {
+				this.gcache[address++]=data;
+				palette=this.palette[(data>>0)&255];
+				context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+				context.fillRect(x*wide,y*wide,wide,wide);
+				x++;
+				palette=this.palette[(data>>8)&255];
+				context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+				context.fillRect(x*wide,y*wide,wide,wide);
+				x++;
+				palette=this.palette[(data>>16)&255];
+				context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+				context.fillRect(x*wide,y*wide,wide,wide);
+				x++;
+				palette=this.palette[(data>>24)&255];
+				context.fillStyle='rgb('+palette[0]+','+palette[1]+','+palette[2]+')';
+				context.fillRect(x*wide,y*wide,wide,wide);
+			}
+		}
+	}
+};
 display.all=function(){
 	var adata,pdata,aaddr,paddr,ascii,palette,posy,posx;
 	var wide=this.wide ? 1:0;
@@ -234,14 +269,18 @@ display.all=function(){
 			this.widegrph();
 			this.context.drawImage(this.gcanvas,0,0);
 			break;
+		case VMODE_PWEBGRPH:
+			this.pwebgrph();
+			this.context.drawImage(this.gcanvas,0,0);
+			break;
 		default: // Not graphic mode
 			break;
 	}
 	aaddr=system.pTVRAM & 0x00ffffff;
-	paddr=(system.pTVRAM+this.width*27) & 0x00ffffff;
+	paddr=(system.pTVRAM+this.width*this.height) & 0x00ffffff;
 	switch(this.width){
 		case 40: case 64: case 80: // 6 dots width
-			for (posy=0;posy<27;posy++) {
+			for (posy=0;posy<this.height;posy++) {
 				for (posx=0;posx<this.width;posx++) {
 					if (0==(aaddr&3)) {
 						adata=system.RAM[(aaddr++)>>2];
@@ -265,7 +304,7 @@ display.all=function(){
 		case 30: // 8 dots width
 			pdata=system.RAM[(paddr-2)>>2]>>8;
 		default: // 8 dots width
-			for (posy=0;posy<27;posy++) {
+			for (posy=0;posy<this.height;posy++) {
 				for (posx=0;posx<this.width;posx++) {
 					if (0==(aaddr&3)) {
 						adata=system.RAM[(aaddr++)>>2];
@@ -324,6 +363,10 @@ display.set_videomode=function(mode,gvram){
 			break;
 		case VMODE_WIDEGRPH: // ワイドグラフィック＋テキスト48文字モード
 			this.width=48;
+			break;
+		case VMODE_PWEBGRPH: // // グラフィック300ドット＋テキスト36文字モード
+			this.height=28;
+			this.width=36;
 			break;
 		default:
 			system.exception("Wrong video mode: "+m);
