@@ -365,7 +365,7 @@ display.set_videomode=function(mode,gvram){
 			this.width=48;
 			break;
 		case VMODE_PWEBGRPH: // // グラフィック300ドット＋テキスト36文字モード
-			this.height=28;
+			this.height=29;
 			this.width=36;
 			break;
 		default:
