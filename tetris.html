@@ -35,7 +35,6 @@
 		<canvas id="display" width="300" height="225"></canvas>
 		<!-- Debug buttons -->
 		<div class="buttons">
-			<span id="speed"><!--clock: 0 hz--></span><br />
 			<a href="#" onclick="document.getElementById('links').style.display='block'; return false;">Links</a><br />
 			<input id="Sbutton" value="S" type="button" ontouchstart="button.start(1);" ontouchend="button.start(0);" onmousedown="button.start(1);" onmouseout="button.start(0);" onmouseup="button.start(0);"/>
 			<input id="Fbutton" value="F" type="button" ontouchstart="button.fire(1);" ontouchend="button.fire(0);" onmousedown="button.fire(1);" onmouseout="button.fire(0);" onmouseup="button.fire(0);"/>
@@ -45,13 +44,7 @@
 			<input id="Rbutton" value="→" type="button" ontouchstart="button.right(1);" ontouchend="button.right(0);" onmousedown="button.right(1);" onmouseout="button.right(0);" onmouseup="button.right(0);"/>
 		</div>
 		<div id="links" class="links">
-			<a href="machikaniawide.html" >US-key-wide</a>
-			<a href="machikania.html" >US-key-narrow</a>
-			<a href="machikaniawide.html?jp=1" >JP-key-wide</a>
-			<a href="machikania.html?jp=1" >JP-key-narrow</a><br />
-			<a href="help.txt" onclick="window.open(this.href); return false;">help</a>
-			<a href="class.txt"onclick="window.open(this.href); return false;">class-help</a><br />
-			<a href="http://www.ze.em-net.ne.jp/~kenken/machikania/typem.html" onclick="window.open(this.href); return false;">MachiKania type M main page</a>
+			<script type="text/javascript" src="./links.js"></script>
 		</div>
 		<div id="debug" class="debug">
 			<!-- debug -->

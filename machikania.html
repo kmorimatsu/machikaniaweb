@@ -38,7 +38,6 @@
 		<canvas id="display" width="480" height="224"></canvas>
 		<!-- Debug buttons -->
 		<div class="buttons">
-			<span id="speed"><!--clock: 0 hz--></span><br />
 			<!-- File upload input -->
 			<input class="hidden" id="load" type="file" onchange="filesystem.loaded(this);" />
 			<!-- File upload button -->
@@ -60,13 +59,7 @@
 			<input id="UseKey4button" type="checkbox" onclick="button.key4button(this);" />Use keys for buttons
 		</div>
 		<div id="links" class="links">
-			<a href="machikaniawide.html" >US-key-wide</a>
-			<a href="machikania.html" >US-key-narrow</a>
-			<a href="machikaniawide.html?jp=1" >JP-key-wide</a>
-			<a href="machikania.html?jp=1" >JP-key-narrow</a><br />
-			<a href="help.txt" onclick="window.open(this.href); return false;">help</a>
-			<a href="class.txt"onclick="window.open(this.href); return false;">class-help</a><br />
-			<a href="http://www.ze.em-net.ne.jp/~kenken/machikania/typem.html" onclick="window.open(this.href); return false;">MachiKania type M main page</a>
+			<script type="text/javascript" src="./links.js"></script>
 		</div>
 		<div id="debug" class="debug">
 			<!-- debug -->
