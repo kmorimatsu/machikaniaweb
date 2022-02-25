@@ -31,6 +31,8 @@ MachiKania webは、以下の URL にアクセスすることで使用できま�
 
 　[machikaniawide.html?jp=1](https://kmorimatsu.github.io/machikania/machikaniawide.html?jp=1)　JP キーボード( 106 キーボード)で、大画面で使用
 
+また、URLを[machikaniawide.html?jp=1&ini=width80](https://kmorimatsu.github.io/machikania/machikaniawide.html?jp=1&ini=width80) の様にすると、起動時のエディターの表示幅を指定できます。width36/width48/width80が有効です。
+
 基本的な使い方は、type M と全く同じです。BASIC プログラムを入力した後、「 F4 」キーを押せば、実行することができます。「 F1 」キーや「 F2 」キーで、プログラムをロードしたりセーブしたりすることができます。
 
 MMC カードの代替になる ZIP アーカイブのやり取りは、「 Load Disk Image 」と「 Save Disk Image 」の二つのボタンで行います。MachiKania 上で SAVE したファイルを取り出したい場合は「 Save Disk Image 」を、PC 側で用意したファイルを MachiKania で使いたい場合は、「 Load Disk Image 」を押してください。
