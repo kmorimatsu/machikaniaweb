@@ -8,6 +8,18 @@
 hexfile.load();
 system.init();
 mmc.setCard();
+if (get.ini) {
+	var t=get.ini.toUpperCase();
+	switch(t){
+		case "WIDTH36":
+		case "WIDTH48":
+		case "WIDTH80":
+			filesystem.root["MACHIKAM.INI"]=t;
+			break;
+		default:
+			break;
+	}
+}
 display.init(system.pFontData,system.pFontData2);
 display.all();
 if (get.debug=='hex') {
