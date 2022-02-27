@@ -77,8 +77,13 @@ display.updateFont=function(ascii,pFontData,font,palette,width){
 			break;
 		case VMODE_MONOTEXT:
 			// Black/white 80 width text
-			rgb="rgb(255,255,255)";
-			bgrgb="rgb(0,0,0)";
+			if (palette&0x80) {
+				bgrgb="rgb(255,255,255)";
+				rgb="rgb(0,0,0)";
+			} else {
+				rgb="rgb(255,255,255)";
+				bgrgb="rgb(0,0,0)";
+			}
 			break;
 		default:
 			// Use only text
