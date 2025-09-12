@@ -32,7 +32,7 @@ document.write((function(){/*
 <p>MachiKania 開発者のサイト
 <ul>
 <li><a href="http://www.ze.em-net.ne.jp/~kenken/index.html"onclick="window.open(this.href); return false;">趣味の電子工作とプログラミング　ケンケンのホームページ</a></li>
-<li><a href="https://www.recfor.net/jeans/"onclick="window.open(this.href); return false;">Jeans & Development</a></li>
+<li><a href="https://www.rad51.net/jeans/"onclick="window.open(this.href); return false;">Jeans & Development</a></li>
 <li><a href="https://twitter.com/KenKenMkIISR"onclick="window.open(this.href); return false;">Twitter: KenKenMKIISR</a></li>
 <li><a href="https://twitter.com/kats_me"onclick="window.open(this.href); return false;">Twitter: Katsumi</a></li>
 </ul>
