@@ -89,6 +89,19 @@ keyboard.convertCode=function(code){
 	}
 };
 keyboard.init=function(){
+	// Keyboard modification by URL
+	// Example: ?key192_vk2asc1_en=39&key192_vk2asc2_en=34
+	var key,match;
+	for(let key in get){
+		match=key.match(/^key([0-9]{1,3})_(.*)$/);
+		if (!match) continue;
+		if (!keyboard[match[2]]) continue;
+		if (!Array.isArray(keyboard[match[2]])) continue;
+		if (keyboard[match[2]].length!=256) continue;
+		if (match[1]<0 || 255<match[1]) continue;
+		if (get[key]<0 || 255<get[key]) continue;
+		keyboard[match[2]][match[1]]=parseInt(get[key], 10);
+	}
 	var i;
 	var conv=function(table,zero2i){
 		// If string set the ascii code
